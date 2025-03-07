@@ -21,5 +21,5 @@
 ## 🔧 Установка и запуск  
 1. Клонируйте репозиторий:  
    ```sh
-   git clone https://github.com/твой-юзернейм/playlist-maker.git
+   git clone https://github.com/denzelandrioki/PlaylistMaker.git
    cd playlist-maker
