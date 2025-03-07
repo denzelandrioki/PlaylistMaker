@@ -1,0 +1,82 @@
+# ========== ОСНОВНЫЕ ФАЙЛЫ, КОТОРЫЕ НЕ ДОЛЖНЫ ПОПАДАТЬ В GIT ==========
+# Файлы Android Studio
+/.idea/
+/*.iml
+/.gradle/
+/local.properties
+/.DS_Store
+
+# Файлы сборки
+/build/
+/captures/
+/outputs/
+/*.keystore
+/*.jks
+
+# Кэшные файлы
+/.cxx/
+/.externalNativeBuild/
+/.cxx/
+.gradle/
+/local.properties
+/.settings/
+.gen/
+bin/
+tmp/
+
+# Файлы Kotlin & Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Логи и отладка
+*.log
+/crashlytics-build.properties
+/firebase-debug.log
+
+# Файлы конфигурации ОС Windows
+Thumbs.db
+ehthumbs.db
+*.lnk
+
+# Файлы зависимостей
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/libraries/
+
+# Файлы сборки Gradle
+*.apk
+*.ap_
+*.aab
+.gradle
+/local.properties
+/.gradle/
+/build/
+/captures/
+
+# Файлы для CI/CD (если не используешь, можно удалить)
+/fastlane/report.xml
+/fastlane/preview.png
+
+# Временные файлы
+*.swp
+*.swo
+*.swn
+
+# Игнорирование специфичных для Windows файлов
+Thumbs.db
+Desktop.ini
+
+# Файлы кеша Android Studio
+.idea/caches
+.idea/libraries
+.idea/modules
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+
+# Если используешь Firebase, но не хочешь загружать сервисные ключи
+/google-services.json
+/google-services.xml

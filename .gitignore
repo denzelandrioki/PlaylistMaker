@@ -1,0 +1,88 @@
+# Android Studio / IntelliJ IDEA
+*.iml
+.idea/
+.gradle/
+local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+
+# OS специфические файлы
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Компилируемые файлы
+/build/
+.cxx/
+.externalNativeBuild/
+
+# Кэшированные файлы Gradle
+.gradle/
+*.log
+
+# Конфигурация SDK (не стоит коммитить, т.к. у других разработчиков может быть другая версия)
+local.properties
+
+# Файлы для захвата экранов
+captures/
+
+# Firebase / Google Services (если используете Firebase)
+google-services.json
+app/google-services.json
+
+# NDK / CMake временные файлы
+*.so
+*.o
+*.obj
+*.ndk
+*.cmake
+*.vcxproj
+*.sln
+*.cpp
+*.h
+
+# Персональные файлы / токены (если используете Fastlane или другие CI/CD инструменты)
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+fastlane/*.keychain
+*.jks
+*.keystore
+
+# IDE-кэш и временные файлы
+*.swp
+*.swo
+*.swn
+*.bak
+*.tmp
+*.temp
+*.class
+
+# MacOS специфические файлы
+*.DS_Store
+
+# Linux специфические файлы
+*.directory
+
+# Windows специфические файлы
+*.lnk
+
+# Unit тесты / логи
+test-results/
+out/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+
+# Coverage reports
+coverage/
+.coverage
+
+# Jetpack Compose preview cache
+.compose-cache/
