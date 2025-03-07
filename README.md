@@ -22,4 +22,4 @@
 1. Клонируйте репозиторий:  
    ```sh
    git clone https://github.com/denzelandrioki/PlaylistMaker.git
-   cd playlist-maker
+   cd PlaylistMaker
