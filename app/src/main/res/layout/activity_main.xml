@@ -1,0 +1,127 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/primary_blue"
+    android:padding="@dimen/screen_padding"
+    tools:context=".MainActivity">
+
+    <!-- Заголовок -->
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/title_main_layout_height"
+        android:gravity="center_vertical"
+        android:text="@string/app_name"
+        android:textSize="@dimen/title_size"
+        android:textColor="@color/white"
+        android:paddingStart="@dimen/screen_padding"
+        android:paddingEnd="@dimen/screen_padding"
+        android:background="@color/primary_blue" />
+
+    <!-- Контейнер для кнопок -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/main_buttom_layout_height"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:layout_marginTop="@dimen/button_margin"
+        android:layout_marginBottom="@dimen/button_margin">
+
+        <!-- Кнопка "Поиск" -->
+        <LinearLayout
+            android:id="@+id/search"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_weight="1"
+            android:layout_marginBottom="@dimen/button_margin"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:background="@drawable/rounded_button"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="@dimen/screen_padding">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/button_icon_size"
+                android:src="@drawable/ic_search"
+                app:tint="@color/black" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/screen_padding"
+                android:text="@string/search"
+                android:textColor="@color/black"
+                android:textSize="@dimen/button_text_size" />
+        </LinearLayout>
+
+        <!-- Кнопка "Медиатека" -->
+        <LinearLayout
+            android:id="@+id/media"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_weight="1"
+            android:layout_marginBottom="@dimen/button_margin"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:background="@drawable/rounded_button"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="@dimen/screen_padding">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/button_icon_size"
+                android:src="@drawable/ic_library"
+                app:tint="@color/black" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/screen_padding"
+                android:text="@string/library"
+                android:textColor="@color/black"
+                android:textSize="@dimen/button_text_size" />
+        </LinearLayout>
+
+        <!-- Кнопка "Настройки" -->
+        <LinearLayout
+            android:id="@+id/setting"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:background="@drawable/rounded_button"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="@dimen/screen_padding">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/button_icon_size"
+                android:src="@drawable/ic_settings"
+                app:tint="@color/black" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/screen_padding"
+                android:text="@string/settings"
+                android:textColor="@color/black"
+                android:textSize="@dimen/button_text_size" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
