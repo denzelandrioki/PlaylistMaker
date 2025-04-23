@@ -5,6 +5,75 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingStart="@dimen/screen_padding"
+    android:paddingEnd="@dimen/screen_padding"
+    android:fitsSystemWindows="true"
     tools:context=".SearchActivity">
+
+
+    <!-- ==== TOP‑APP‑BAR ==================================================== -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_arrow_back_24"
+            android:contentDescription="@string/back"
+            app:tint="?attr/colorOnBackground" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/search"
+            android:textSize="@dimen/title_size"
+            android:textColor="?attr/colorOnBackground"
+            android:fontFamily="@font/ys_text_medium" />
+    </LinearLayout>
+
+    <!-- ==== SEARCH FIELD =================================================== -->
+    <EditText
+        android:id="@+id/searchEditText"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_search_light"
+        android:drawableStart="@drawable/ic_search_16"
+        android:drawablePadding="8dp"
+        android:hint="@string/search_hint"
+        android:inputType="text"
+        android:maxLines="1"
+        android:imeOptions="actionSearch"
+        android:paddingStart="40dp"
+        android:paddingEnd="48dp"
+        android:textSize="@dimen/text_size"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBar" />
+
+    <!-- кнопка «×» -->
+    <ImageButton
+        android:id="@+id/clearButton"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_clear_24"
+        android:contentDescription="@string/clear"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/searchEditText"
+        app:layout_constraintTop_toTopOf="@id/searchEditText"
+        app:layout_constraintBottom_toBottomOf="@id/searchEditText"
+        app:tint="@color/black" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

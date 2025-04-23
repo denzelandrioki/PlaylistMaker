@@ -6,22 +6,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/primary_blue"
+    style="@style/MainBackgroundColor"
     android:padding="@dimen/screen_padding"
     tools:context=".MainActivity">
 
     <!-- Заголовок -->
     <TextView
         android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/title_main_layout_height"
-        android:gravity="center_vertical"
-        android:text="@string/app_name"
-        android:textSize="@dimen/title_size"
-        android:textColor="@color/white"
-        android:paddingStart="@dimen/screen_padding"
-        android:paddingEnd="@dimen/screen_padding"
-        android:background="@color/primary_blue" />
+        style="@style/TitleStyle"
+        android:text="@string/app_name" />
 
     <!-- Контейнер для кнопок -->
     <LinearLayout
@@ -36,17 +29,9 @@
         <!-- Кнопка "Поиск" -->
         <LinearLayout
             android:id="@+id/search"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/button_height"
+            style="@style/MainButtonStyle"
             android:layout_weight="1"
-            android:layout_marginBottom="@dimen/button_margin"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            android:background="@drawable/rounded_button"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="@dimen/screen_padding">
+            android:layout_marginBottom="@dimen/button_margin">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -59,6 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/screen_padding"
                 android:text="@string/search"
+                android:fontFamily="@font/ys_text_regular"
                 android:textColor="@color/black"
                 android:textSize="@dimen/button_text_size" />
         </LinearLayout>
@@ -66,17 +52,9 @@
         <!-- Кнопка "Медиатека" -->
         <LinearLayout
             android:id="@+id/media"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/button_height"
+            style="@style/MainButtonStyle"
             android:layout_weight="1"
-            android:layout_marginBottom="@dimen/button_margin"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            android:background="@drawable/rounded_button"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="@dimen/screen_padding">
+            android:layout_marginBottom="@dimen/button_margin">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -89,6 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/screen_padding"
                 android:text="@string/library"
+                android:fontFamily="@font/ys_text_regular"
                 android:textColor="@color/black"
                 android:textSize="@dimen/button_text_size" />
         </LinearLayout>
@@ -96,16 +75,9 @@
         <!-- Кнопка "Настройки" -->
         <LinearLayout
             android:id="@+id/setting"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/button_height"
+            style="@style/MainButtonStyle"
             android:layout_weight="1"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            android:background="@drawable/rounded_button"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="@dimen/screen_padding">
+            android:layout_marginBottom="@dimen/button_margin">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -118,6 +90,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/screen_padding"
                 android:text="@string/settings"
+                android:fontFamily="@font/ys_text_regular"
                 android:textColor="@color/black"
                 android:textSize="@dimen/button_text_size" />
         </LinearLayout>

@@ -4,4 +4,8 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="light_gray">#D3D3D3</color>
+    <!-- Дополнительные цвета для дневной темы -->
+
+    <color name="searchField_light">#E7EAF2</color>
+    <color name="searchField_dark">#FFFFFF</color>
 </resources>

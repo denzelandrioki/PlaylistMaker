@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="lightGray">#C2BFBF</color>
+    <!-- Если хотите использовать свои цвета для ночного режима -->
+    <color name="primary_blue">#3366FF</color> <!-- Например, можно оставить неизменным -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="light_gray">#C2BFBF</color> <!-- Немного изменён, если нужно -->
+    <!-- Дополнительные цвета для ночной темы -->
+
+    <color name="searchField_light">#E7EAF2</color>
+    <color name="searchField_dark">#FFFFFF</color>
 </resources>

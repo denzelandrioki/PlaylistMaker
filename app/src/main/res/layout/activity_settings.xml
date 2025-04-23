@@ -10,19 +10,11 @@
     <!-- Panel Header -->
     <TextView
         android:id="@+id/settingsTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/SettingsTitleStyle"
         android:text="@string/settings"
-        android:textSize="@dimen/title_size"
-        android:textStyle="bold"
-        android:textColor="?attr/colorOnBackground"
-        android:gravity="start"
-        android:paddingTop="@dimen/screen_padding"
-        android:paddingStart="@dimen/screen_padding"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- Контейнер с настройками -->
     <LinearLayout
         android:id="@+id/settingsContainer"
         android:layout_width="match_parent"
@@ -33,22 +25,19 @@
         app:layout_constraintTop_toBottomOf="@id/settingsTitle"
         app:layout_constraintBottom_toTopOf="@id/customBottomBar">
 
-        <!-- Темная тема -->
+        <!-- Тёмная тема -->
         <LinearLayout
+            android:id="@+id/dark_theme_row"
+            style="@style/SettingsRowSelectableStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="@dimen/item_padding"
-            android:background="?attr/selectableItemBackground"
-            android:gravity="center_vertical"
-            android:layout_marginTop="@dimen/item_margin">
+            android:gravity="center_vertical">
 
             <TextView
-                android:layout_width="@dimen/buttom_layout_width"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
+                style="@style/SettingsRowTextStyle"
                 android:text="@string/dark_theme"
-                android:textSize="@dimen/text_size"
                 android:textColor="?attr/colorOnBackground" />
 
             <Switch
@@ -57,82 +46,59 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
 
-        <!-- Поделиться приложением -->
+        <!-- Поделиться -->
         <LinearLayout
+            android:id="@+id/share_app_button"
+            style="@style/SettingsRowWhiteStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/item_padding"
-            android:background="@color/white"
-            android:gravity="center_vertical">
+            android:layout_height="wrap_content">
 
             <TextView
-                android:layout_width="@dimen/buttom_layout_width"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
+                style="@style/SettingsRowTextStyle"
                 android:text="@string/share_app"
-                android:textSize="@dimen/text_size"
-                android:textColor="@color/black" />
-
-            <ImageView
-                android:layout_width="@dimen/button_icon_size"
-                android:layout_height="@dimen/button_icon_size"
-                android:src="@drawable/ic_share"
-                android:contentDescription="@string/share_app"
-                app:tint="@color/light_gray" />
-        </LinearLayout>
-
-        <!-- Написать в поддержку -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/item_padding"
-            android:background="@color/white"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:layout_width="@dimen/buttom_layout_width"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/support"
-                android:textSize="@dimen/text_size"
                 android:textColor="?attr/colorOnBackground" />
 
             <ImageView
-                android:layout_width="@dimen/button_icon_size"
-                android:layout_height="@dimen/button_icon_size"
-                android:src="@drawable/ic_support"
-                android:contentDescription="@string/support"
-                app:tint="@color/light_gray" />
+                style="@style/SettingsRowIconStyle"
+                android:src="@drawable/ic_share"
+                android:contentDescription="@string/share_app" />
         </LinearLayout>
 
-        <!-- Пользовательское соглашение -->
+        <!-- Поддержка -->
         <LinearLayout
+            android:id="@+id/support_button"
+            style="@style/SettingsRowWhiteStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/item_padding"
-            android:background="@color/white"
-            android:gravity="center_vertical">
+            android:layout_height="wrap_content">
 
             <TextView
-                android:layout_width="@dimen/buttom_layout_width"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/user_agreement"
-                android:textSize="@dimen/text_size"
-                android:textColor="@color/black" />
+                style="@style/SettingsRowTextStyle"
+                android:text="@string/support" />
 
             <ImageView
-                android:layout_width="@dimen/button_icon_size"
-                android:layout_height="@dimen/button_icon_size"
+                style="@style/SettingsRowIconStyle"
+                android:src="@drawable/ic_support"
+                android:contentDescription="@string/support" />
+        </LinearLayout>
+
+        <!-- Соглашение -->
+        <LinearLayout
+            android:id="@+id/user_agreement_button"
+            style="@style/SettingsRowWhiteStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                style="@style/SettingsRowTextStyle"
+                android:text="@string/user_agreement"
+                 />
+
+            <ImageView
+                style="@style/SettingsRowIconStyle"
                 android:src="@drawable/ic_arrow_right"
-                android:contentDescription="@string/user_agreement"
-                app:tint="@color/light_gray" />
+                android:contentDescription="@string/user_agreement" />
         </LinearLayout>
     </LinearLayout>
-
 
     <!-- Нижняя панель -->
     <LinearLayout
@@ -148,80 +114,46 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Кнопка "Поиск" -->
+        <!-- Кнопка «Поиск» -->
         <LinearLayout
-            android:layout_width="@dimen/buttom_layout_width"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@color/white">
+            android:id="@+id/search_button"
+            style="@style/BottomNavItemStyle">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_search"
-                app:tint="@color/black" />
+                style="@style/BottomNavIconStyle"
+                android:src="@drawable/ic_search" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/search"
-                android:textSize="@dimen/navigat_text_size"
-                android:textColor="@color/black" />
+                style="@style/BottomNavTextStyle"
+                android:text="@string/search" />
         </LinearLayout>
 
-        <!-- Кнопка "Медиатека" -->
+        <!-- Кнопка «Медиатека» -->
         <LinearLayout
-            android:layout_width="@dimen/buttom_layout_width"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@color/white">
+            android:id="@+id/media_button"
+            style="@style/BottomNavItemStyle">
 
             <ImageView
-                android:layout_width="@dimen/setting_bar_image_size"
-                android:layout_height="@dimen/setting_bar_image_size"
-                android:src="@drawable/ic_library"
-                app:tint="@color/black" />
+                style="@style/BottomNavIconStyle"
+                android:src="@drawable/ic_library" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/library"
-                android:textSize="@dimen/navigat_text_size"
-                android:textColor="@color/black" />
+                style="@style/BottomNavTextStyle"
+                android:text="@string/library" />
         </LinearLayout>
 
-        <!-- Кнопка "Настройки" -->
+        <!-- Кнопка «Настройки» -->
         <LinearLayout
-            android:layout_width="@dimen/buttom_layout_width"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@color/white">
+            android:id="@+id/setting_button"
+            style="@style/BottomNavItemStyle">
 
             <ImageView
-                android:layout_width="@dimen/setting_bar_image_size"
-                android:layout_height="@dimen/setting_bar_image_size"
-                android:src="@drawable/ic_settings"
-                app:tint="@color/black" />
+                style="@style/BottomNavIconStyle"
+                android:src="@drawable/ic_settings" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/settings"
-                android:textSize="@dimen/navigat_text_size"
-                android:textColor="@color/black" />
+                style="@style/BottomNavTextStyle"
+                android:text="@string/settings" />
         </LinearLayout>
-
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
