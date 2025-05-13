@@ -11,90 +11,54 @@
     tools:context=".MainActivity">
 
     <!-- Заголовок -->
-    <TextView
-        android:id="@+id/title"
-        style="@style/TitleStyle"
-        android:text="@string/app_name" />
-
-    <!-- Контейнер для кнопок -->
-    <LinearLayout
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/mainToolbar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/main_buttom_layout_height"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:layout_weight="1"
-        android:layout_marginTop="@dimen/button_margin"
-        android:layout_marginBottom="@dimen/button_margin">
+        android:layout_height="?attr/actionBarSize"
+
+        app:title="@string/app_name"
+        app:titleTextAppearance="@style/ToolbarTitleTextAppearance"
+        app:titleTextColor="@color/white" />
+
 
         <!-- Кнопка "Поиск" -->
-        <LinearLayout
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/search"
             style="@style/MainButtonStyle"
-            android:layout_weight="1"
-            android:layout_marginBottom="@dimen/button_margin">
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginBottom="@dimen/button_margin"
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/button_icon_size"
-                android:src="@drawable/ic_search"
-                app:tint="@color/black" />
+            android:text="@string/search"
+            app:icon="@drawable/ic_search"
+            app:iconGravity="textStart"
+            app:iconPadding="@dimen/screen_padding" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/screen_padding"
-                android:text="@string/search"
-                android:fontFamily="@font/ys_text_regular"
-                android:textColor="@color/black"
-                android:textSize="@dimen/button_text_size" />
-        </LinearLayout>
 
         <!-- Кнопка "Медиатека" -->
-        <LinearLayout
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/media"
             style="@style/MainButtonStyle"
-            android:layout_weight="1"
-            android:layout_marginBottom="@dimen/button_margin">
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginBottom="@dimen/button_margin"
+            android:text="@string/library"
+            app:icon="@drawable/ic_library"
+            app:iconGravity="textStart"
+            app:iconPadding="@dimen/screen_padding"/>
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/button_icon_size"
-                android:src="@drawable/ic_library"
-                app:tint="@color/black" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/screen_padding"
-                android:text="@string/library"
-                android:fontFamily="@font/ys_text_regular"
-                android:textColor="@color/black"
-                android:textSize="@dimen/button_text_size" />
-        </LinearLayout>
 
         <!-- Кнопка "Настройки" -->
-        <LinearLayout
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/setting"
             style="@style/MainButtonStyle"
-            android:layout_weight="1"
-            android:layout_marginBottom="@dimen/button_margin">
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginBottom="@dimen/button_margin"
+            android:text="@string/settings"
+            app:icon="@drawable/ic_settings"
+            app:iconGravity="textStart"
+            app:iconPadding="@dimen/screen_padding"/>
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/button_icon_size"
-                android:src="@drawable/ic_settings"
-                app:tint="@color/black" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/screen_padding"
-                android:text="@string/settings"
-                android:fontFamily="@font/ys_text_regular"
-                android:textColor="@color/black"
-                android:textSize="@dimen/button_text_size" />
-        </LinearLayout>
-
-    </LinearLayout>
 
 </LinearLayout>

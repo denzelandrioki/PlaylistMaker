@@ -4,6 +4,13 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="light_gray">#D3D3D3</color>
+    <color name="yp_blue">#3772E7</color>
+    <color name="search_icon_light">#AEAFB4</color>
+    <color name="YP_Black">#1A1B22</color>
+    <color name="switch_thumb_on">#3772E7</color>   <!-- кнопка -->
+    <color name="switch_track_on">#9FBBF3</color>  <!-- дорожка -->
+    <color name="switch_thumb_off">#AEAFB4</color>  <!-- для примера: серый, когда выключен -->
+    <color name="switch_track_off">#E6E8EB</color>
     <!-- Дополнительные цвета для дневной темы -->
 
     <color name="searchField_light">#E7EAF2</color>

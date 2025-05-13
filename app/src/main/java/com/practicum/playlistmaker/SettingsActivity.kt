@@ -5,13 +5,15 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.LinearLayout
-import android.widget.Switch
+import com.google.android.material.switchmaterial.SwitchMaterial
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.textview.MaterialTextView
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,7 +23,17 @@ class SettingsActivity : AppCompatActivity() {
 
 
         // Найдем переключатель для темы
-        val darkThemeSwitch = findViewById<Switch>(R.id.darkThemeSwitch)
+        val darkThemeSwitch = findViewById<SwitchMaterial>(R.id.darkThemeSwitch)
+
+
+        // 1) Привязываем toolbar как ActionBar
+        val toolbar = findViewById<MaterialToolbar>(R.id.settingsToolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+
+        // 2) Обрабатываем клик на значок «назад»
+        toolbar.setNavigationOnClickListener { finish() }
 
         // Применим сохраненное состояние или установим по умолчанию (например, дневной режим)
         // Можно сохранить выбор пользователя в SharedPreferences, но для примера установим дневной режим
@@ -42,9 +54,9 @@ class SettingsActivity : AppCompatActivity() {
 
 
         // Находим кнопки по id
-        val shareButton = findViewById<LinearLayout>(R.id.share_app_button)
-        val supportButton = findViewById<LinearLayout>(R.id.support_button)
-        val userAgreementButton = findViewById<LinearLayout>(R.id.user_agreement_button)
+        val shareButton = findViewById<MaterialTextView>(R.id.share_app_button)
+        val supportButton = findViewById<MaterialTextView>(R.id.support_button)
+        val userAgreementButton = findViewById<MaterialTextView>(R.id.user_agreement_button)
 
 
         // Обработка нажатия кнопки "Поделиться приложением"

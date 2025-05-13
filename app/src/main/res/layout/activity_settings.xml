@@ -1,159 +1,69 @@
-<androidx.constraintlayout.widget.ConstraintLayout
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context=".SettingsActivity">
+    android:orientation="vertical"
+    android:padding="@dimen/screen_padding"
+    tools:context=".SettingsActivity"
+    android:fitsSystemWindows="true">
 
-    <!-- Panel Header -->
-    <TextView
-        android:id="@+id/settingsTitle"
-        style="@style/SettingsTitleStyle"
-        android:text="@string/settings"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <LinearLayout
-        android:id="@+id/settingsContainer"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/settingsToolbar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/main_buttom_layout_height"
-        android:orientation="vertical"
-        android:paddingVertical="@dimen/item_padding"
-        android:layout_marginTop="@dimen/item_margin"
-        app:layout_constraintTop_toBottomOf="@id/settingsTitle"
-        app:layout_constraintBottom_toTopOf="@id/customBottomBar">
-
-        <!-- Тёмная тема -->
-        <LinearLayout
-            android:id="@+id/dark_theme_row"
-            style="@style/SettingsRowSelectableStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/item_padding"
-            android:gravity="center_vertical">
-
-            <TextView
-                style="@style/SettingsRowTextStyle"
-                android:text="@string/dark_theme"
-                android:textColor="?attr/colorOnBackground" />
-
-            <Switch
-                android:id="@+id/darkThemeSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <!-- Поделиться -->
-        <LinearLayout
-            android:id="@+id/share_app_button"
-            style="@style/SettingsRowWhiteStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                style="@style/SettingsRowTextStyle"
-                android:text="@string/share_app"
-                android:textColor="?attr/colorOnBackground" />
-
-            <ImageView
-                style="@style/SettingsRowIconStyle"
-                android:src="@drawable/ic_share"
-                android:contentDescription="@string/share_app" />
-        </LinearLayout>
-
-        <!-- Поддержка -->
-        <LinearLayout
-            android:id="@+id/support_button"
-            style="@style/SettingsRowWhiteStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                style="@style/SettingsRowTextStyle"
-                android:text="@string/support" />
-
-            <ImageView
-                style="@style/SettingsRowIconStyle"
-                android:src="@drawable/ic_support"
-                android:contentDescription="@string/support" />
-        </LinearLayout>
-
-        <!-- Соглашение -->
-        <LinearLayout
-            android:id="@+id/user_agreement_button"
-            style="@style/SettingsRowWhiteStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                style="@style/SettingsRowTextStyle"
-                android:text="@string/user_agreement"
-                 />
-
-            <ImageView
-                style="@style/SettingsRowIconStyle"
-                android:src="@drawable/ic_arrow_right"
-                android:contentDescription="@string/user_agreement" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- Нижняя панель -->
-    <LinearLayout
-        android:id="@+id/customBottomBar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/bottom_bar_height"
+        android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorSurface"
-        android:orientation="horizontal"
-        android:paddingVertical="@dimen/item_margin"
-        android:elevation="@dimen/item_margin"
-        android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:navigationIcon="@drawable/ic_arrow_back_24"
+        app:navigationIconTint="?attr/colorOnSurface"
+        app:title="@string/settings"
+        app:titleTextAppearance="@style/TitleStyle"
+        app:titleTextColor="?attr/colorOnSurface"
+        android:fitsSystemWindows="true"/>
 
-        <!-- Кнопка «Поиск» -->
-        <LinearLayout
-            android:id="@+id/search_button"
-            style="@style/BottomNavItemStyle">
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:paddingStart="@dimen/screen_padding"
+        android:paddingEnd="@dimen/screen_padding"
+        android:id="@+id/darkThemeSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dark_theme"
+        android:textSize="16sp"
+        android:paddingVertical="20dp"
+        android:gravity="center_vertical"
+        app:thumbTint="@color/switch_thumb_color"
+        app:trackTint="@color/switch_track_color"
+        app:useMaterialThemeColors="false"/>
 
-            <ImageView
-                style="@style/BottomNavIconStyle"
-                android:src="@drawable/ic_search" />
+    <com.google.android.material.textview.MaterialTextView
+        android:paddingStart="@dimen/screen_padding"
+        android:paddingEnd="@dimen/screen_padding"
+        android:id="@+id/share_app_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/share_app"
+        android:drawableEnd="@drawable/ic_share"
+        android:drawablePadding="16dp"
+        android:paddingVertical="20dp" />
 
-            <TextView
-                style="@style/BottomNavTextStyle"
-                android:text="@string/search" />
-        </LinearLayout>
+    <com.google.android.material.textview.MaterialTextView
+        android:paddingStart="@dimen/screen_padding"
+        android:paddingEnd="@dimen/screen_padding"
+        android:id="@+id/support_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/support"
+        android:drawableEnd="@drawable/ic_support"
+        android:paddingVertical="20dp" />
 
-        <!-- Кнопка «Медиатека» -->
-        <LinearLayout
-            android:id="@+id/media_button"
-            style="@style/BottomNavItemStyle">
-
-            <ImageView
-                style="@style/BottomNavIconStyle"
-                android:src="@drawable/ic_library" />
-
-            <TextView
-                style="@style/BottomNavTextStyle"
-                android:text="@string/library" />
-        </LinearLayout>
-
-        <!-- Кнопка «Настройки» -->
-        <LinearLayout
-            android:id="@+id/setting_button"
-            style="@style/BottomNavItemStyle">
-
-            <ImageView
-                style="@style/BottomNavIconStyle"
-                android:src="@drawable/ic_settings" />
-
-            <TextView
-                style="@style/BottomNavTextStyle"
-                android:text="@string/settings" />
-        </LinearLayout>
-    </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.textview.MaterialTextView
+        android:paddingStart="@dimen/screen_padding"
+        android:paddingEnd="@dimen/screen_padding"
+        android:id="@+id/user_agreement_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/user_agreement"
+        android:drawableEnd="@drawable/ic_arrow_right"
+        android:paddingVertical="20dp" />
+</LinearLayout>

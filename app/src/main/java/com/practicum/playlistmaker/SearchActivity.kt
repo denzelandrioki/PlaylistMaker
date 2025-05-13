@@ -4,13 +4,11 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
+import androidx.core.view.isVisible
+import com.google.android.material.appbar.MaterialToolbar
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
 
 class SearchActivity : AppCompatActivity() {
@@ -25,9 +23,10 @@ class SearchActivity : AppCompatActivity() {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // ← назад
-        binding.backButton.setOnClickListener { finish() }
-
+        val toolbar = binding.root.findViewById<MaterialToolbar>(R.id.searchToolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener { finish() }
 
         // Восстанавливаем текст из состояния, если оно было сохранено
         savedInstanceState?.let {
@@ -61,8 +60,7 @@ class SearchActivity : AppCompatActivity() {
             searchText = s.toString()
 
             // Показываем или скрываем кнопку "×" в зависимости от наличия текста
-            binding.clearButton.visibility =
-                if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+            binding.clearButton.isVisible = !s.isNullOrEmpty()
         }
 
         override fun afterTextChanged(s: Editable?) {
