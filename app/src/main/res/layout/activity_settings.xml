@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="@dimen/screen_padding"
     tools:context=".SettingsActivity"
     android:fitsSystemWindows="true">
 
@@ -19,17 +18,17 @@
         app:navigationIconTint="?attr/colorOnSurface"
         app:title="@string/settings"
         app:titleTextAppearance="@style/TitleStyle"
-        app:titleTextColor="?attr/colorOnSurface"
         android:fitsSystemWindows="true"/>
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:paddingStart="@dimen/screen_padding"
         android:paddingEnd="@dimen/screen_padding"
+        style="@style/TextNoTitle"
         android:id="@+id/darkThemeSwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/menu_gap"
         android:text="@string/dark_theme"
-        android:textSize="16sp"
         android:paddingVertical="20dp"
         android:gravity="center_vertical"
         app:thumbTint="@color/switch_thumb_color"
@@ -39,6 +38,7 @@
     <com.google.android.material.textview.MaterialTextView
         android:paddingStart="@dimen/screen_padding"
         android:paddingEnd="@dimen/screen_padding"
+        style="@style/TextNoTitle"
         android:id="@+id/share_app_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -50,6 +50,7 @@
     <com.google.android.material.textview.MaterialTextView
         android:paddingStart="@dimen/screen_padding"
         android:paddingEnd="@dimen/screen_padding"
+        style="@style/TextNoTitle"
         android:id="@+id/support_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -60,6 +61,7 @@
     <com.google.android.material.textview.MaterialTextView
         android:paddingStart="@dimen/screen_padding"
         android:paddingEnd="@dimen/screen_padding"
+        style="@style/TextNoTitle"
         android:id="@+id/user_agreement_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -5,6 +5,10 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="light_gray">#C2BFBF</color><!-- Немного изменён, если нужно -->
+    <color name="YP_Black">#1A1B22</color>
+    <color name="share_icon_tint">#FFFFFF</color>
+    <color name="share_back_icon_tint">#FFFFFF</color>
+    <color name="share_icon_search">#1A1B22</color>
 
     <!-- Дополнительные цвета для ночной темы -->
 

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="screen_padding">16dp</dimen>
-    <dimen name="title_size">24sp</dimen>
+    <dimen name="title_size">22sp</dimen>
+    <dimen name="no_title_text_size">16sp</dimen>
+
     <dimen name="text_size">18sp</dimen>
     <dimen name="button_text_size">18sp</dimen>
     <dimen name="small_text_size">12sp</dimen>
@@ -9,6 +11,7 @@
     <dimen name="bottom_bar_height">56dp</dimen>
     <dimen name="item_padding">16dp</dimen>
     <dimen name="item_margin">8dp</dimen>
+    <dimen name="menu_gap">24dp</dimen>
     <dimen name="button_height">187dp</dimen>
     <dimen name="button_margin">16dp</dimen>
     <dimen name="navigat_text_size">12sp</dimen>

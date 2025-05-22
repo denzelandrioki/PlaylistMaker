@@ -5,7 +5,7 @@
     android:viewportHeight="24">
 
     <path
-        android:fillColor="?attr/colorControlNormal"
+        android:fillColor="@color/share_icon_search"
         android:pathData="M15.5,14H14.71L14.43,13.73
                           C15.37,12.65 16,11.22 16,9.66
                           A6.5,6.5 0 1,0 9.5,16
