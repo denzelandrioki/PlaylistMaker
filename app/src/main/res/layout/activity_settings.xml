@@ -1,227 +1,71 @@
-<androidx.constraintlayout.widget.ConstraintLayout
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context=".SettingsActivity">
+    android:orientation="vertical"
+    tools:context=".SettingsActivity"
+    android:fitsSystemWindows="true">
 
-    <!-- Panel Header -->
-    <TextView
-        android:id="@+id/settingsTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/settings"
-        android:textSize="@dimen/title_size"
-        android:textStyle="bold"
-        android:textColor="?attr/colorOnBackground"
-        android:gravity="start"
-        android:paddingTop="@dimen/screen_padding"
-        android:paddingStart="@dimen/screen_padding"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <!-- Контейнер с настройками -->
-    <LinearLayout
-        android:id="@+id/settingsContainer"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/settingsToolbar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/main_buttom_layout_height"
-        android:orientation="vertical"
-        android:paddingVertical="@dimen/item_padding"
-        android:layout_marginTop="@dimen/item_margin"
-        app:layout_constraintTop_toBottomOf="@id/settingsTitle"
-        app:layout_constraintBottom_toTopOf="@id/customBottomBar">
-
-        <!-- Темная тема -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/item_padding"
-            android:background="?attr/selectableItemBackground"
-            android:gravity="center_vertical"
-            android:layout_marginTop="@dimen/item_margin">
-
-            <TextView
-                android:layout_width="@dimen/buttom_layout_width"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/dark_theme"
-                android:textSize="@dimen/text_size"
-                android:textColor="?attr/colorOnBackground" />
-
-            <Switch
-                android:id="@+id/darkThemeSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <!-- Поделиться приложением -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/item_padding"
-            android:background="@color/white"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:layout_width="@dimen/buttom_layout_width"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/share_app"
-                android:textSize="@dimen/text_size"
-                android:textColor="@color/black" />
-
-            <ImageView
-                android:layout_width="@dimen/button_icon_size"
-                android:layout_height="@dimen/button_icon_size"
-                android:src="@drawable/ic_share"
-                android:contentDescription="@string/share_app"
-                app:tint="@color/light_gray" />
-        </LinearLayout>
-
-        <!-- Написать в поддержку -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/item_padding"
-            android:background="@color/white"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:layout_width="@dimen/buttom_layout_width"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/support"
-                android:textSize="@dimen/text_size"
-                android:textColor="?attr/colorOnBackground" />
-
-            <ImageView
-                android:layout_width="@dimen/button_icon_size"
-                android:layout_height="@dimen/button_icon_size"
-                android:src="@drawable/ic_support"
-                android:contentDescription="@string/support"
-                app:tint="@color/light_gray" />
-        </LinearLayout>
-
-        <!-- Пользовательское соглашение -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/item_padding"
-            android:background="@color/white"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:layout_width="@dimen/buttom_layout_width"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/user_agreement"
-                android:textSize="@dimen/text_size"
-                android:textColor="@color/black" />
-
-            <ImageView
-                android:layout_width="@dimen/button_icon_size"
-                android:layout_height="@dimen/button_icon_size"
-                android:src="@drawable/ic_arrow_right"
-                android:contentDescription="@string/user_agreement"
-                app:tint="@color/light_gray" />
-        </LinearLayout>
-    </LinearLayout>
-
-
-    <!-- Нижняя панель -->
-    <LinearLayout
-        android:id="@+id/customBottomBar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/bottom_bar_height"
+        android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorSurface"
-        android:orientation="horizontal"
-        android:paddingVertical="@dimen/item_margin"
-        android:elevation="@dimen/item_margin"
-        android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:navigationIcon="@drawable/ic_arrow_back_24"
+        app:navigationIconTint="?attr/colorOnSurface"
+        app:title="@string/settings"
+        app:titleTextAppearance="@style/TitleStyle"
+        android:fitsSystemWindows="true"/>
 
-        <!-- Кнопка "Поиск" -->
-        <LinearLayout
-            android:layout_width="@dimen/buttom_layout_width"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@color/white">
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:paddingStart="@dimen/screen_padding"
+        android:paddingEnd="@dimen/screen_padding"
+        style="@style/TextNoTitle"
+        android:id="@+id/darkThemeSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/menu_gap"
+        android:text="@string/dark_theme"
+        android:paddingVertical="20dp"
+        android:gravity="center_vertical"
+        app:thumbTint="@color/switch_thumb_color"
+        app:trackTint="@color/switch_track_color"
+        app:useMaterialThemeColors="false"/>
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_search"
-                app:tint="@color/black" />
+    <com.google.android.material.textview.MaterialTextView
+        android:paddingStart="@dimen/screen_padding"
+        android:paddingEnd="@dimen/screen_padding"
+        style="@style/TextNoTitle"
+        android:id="@+id/share_app_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/share_app"
+        android:drawableEnd="@drawable/ic_share"
+        android:drawablePadding="16dp"
+        android:paddingVertical="20dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/search"
-                android:textSize="@dimen/navigat_text_size"
-                android:textColor="@color/black" />
-        </LinearLayout>
+    <com.google.android.material.textview.MaterialTextView
+        android:paddingStart="@dimen/screen_padding"
+        android:paddingEnd="@dimen/screen_padding"
+        style="@style/TextNoTitle"
+        android:id="@+id/support_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/support"
+        android:drawableEnd="@drawable/ic_support"
+        android:paddingVertical="20dp" />
 
-        <!-- Кнопка "Медиатека" -->
-        <LinearLayout
-            android:layout_width="@dimen/buttom_layout_width"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@color/white">
-
-            <ImageView
-                android:layout_width="@dimen/setting_bar_image_size"
-                android:layout_height="@dimen/setting_bar_image_size"
-                android:src="@drawable/ic_library"
-                app:tint="@color/black" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/library"
-                android:textSize="@dimen/navigat_text_size"
-                android:textColor="@color/black" />
-        </LinearLayout>
-
-        <!-- Кнопка "Настройки" -->
-        <LinearLayout
-            android:layout_width="@dimen/buttom_layout_width"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@color/white">
-
-            <ImageView
-                android:layout_width="@dimen/setting_bar_image_size"
-                android:layout_height="@dimen/setting_bar_image_size"
-                android:src="@drawable/ic_settings"
-                app:tint="@color/black" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/settings"
-                android:textSize="@dimen/navigat_text_size"
-                android:textColor="@color/black" />
-        </LinearLayout>
-
-    </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.textview.MaterialTextView
+        android:paddingStart="@dimen/screen_padding"
+        android:paddingEnd="@dimen/screen_padding"
+        style="@style/TextNoTitle"
+        android:id="@+id/user_agreement_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/user_agreement"
+        android:drawableEnd="@drawable/ic_arrow_right"
+        android:paddingVertical="20dp" />
+</LinearLayout>
