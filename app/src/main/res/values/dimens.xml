@@ -14,9 +14,11 @@
     <dimen name="menu_gap">24dp</dimen>
     <dimen name="button_height">187dp</dimen>
     <dimen name="button_margin">16dp</dimen>
-    <dimen name="navigat_text_size">12sp</dimen>
+    <dimen name="navigat_text_size">11sp</dimen>
     <dimen name="title_main_layout_height">56dp</dimen>
     <dimen name="main_buttom_layout_height">0dp</dimen>
     <dimen name="buttom_layout_width">0dp</dimen>
     <dimen name="setting_bar_image_size">24dp</dimen>
+    <dimen name="track_cover_radius">4dp</dimen>
+    <dimen name="search_list_gap">16dp</dimen>
 </resources>
