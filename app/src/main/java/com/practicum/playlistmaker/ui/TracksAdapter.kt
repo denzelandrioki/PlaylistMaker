@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.model.Track
 
 class TracksAdapter (
-    private val tracks: List<Track>,
+    private var tracks: MutableList<Track> = ArrayList(),
     private val onClick: (Track) -> Unit = {}
 
 ): RecyclerView.Adapter<TrackViewHolder>(){
@@ -21,5 +21,12 @@ class TracksAdapter (
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tracks[position])
         holder.itemView.setOnClickListener { onClick(tracks[position]) }
+    }
+
+
+    fun setData(tracks: List<Track>) {
+        this.tracks.clear()
+        this.tracks.addAll(tracks) // Без всяких cast!
+        notifyDataSetChanged()
     }
 }

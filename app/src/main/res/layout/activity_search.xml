@@ -9,8 +9,7 @@
     android:fitsSystemWindows="true"
     tools:context=".SearchActivity">
 
-
-    <!-- ==== TOP‑APP‑BAR ==================================================== -->
+    <!-- ==== TOP‑APP‑BAR ==== -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/searchToolbar"
         android:layout_width="0dp"
@@ -23,14 +22,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- ==== SEARCH FIELD =================================================== -->
+    <!-- ==== SEARCH FIELD ==== -->
     <FrameLayout
         android:id="@+id/searchContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/screen_padding"
         android:paddingEnd="@dimen/screen_padding"
-
         tools:ignore="MissingConstraints"
         app:layout_constraintTop_toBottomOf="@id/searchToolbar"
         app:layout_constraintStart_toStartOf="parent"
@@ -54,7 +52,7 @@
             android:drawablePadding="8dp"
             android:hint="@string/search_hint"
             android:maxLines="1"
-            android:imeOptions="actionSearch"
+            android:imeOptions="actionDone"
             android:paddingStart="12dp"
             android:paddingEnd="48dp"
             android:textColor="@color/black"/>
@@ -73,6 +71,75 @@
             app:tint="?attr/searchIconTint" />
     </FrameLayout>
 
+    <!-- ==== PLACEHOLDER: нет результатов ==== -->
+    <LinearLayout
+        android:id="@+id/emptyPlaceholder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/searchContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="102dp">
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            style="@style/IconNoTrack"
+            android:contentDescription="@string/search_hint" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_tracks_found"
+            android:textSize="19sp"
+            style="@style/TextNoTrack"
+            android:paddingTop="16dp"
+            android:gravity="center"/>
+    </LinearLayout>
+
+    <!-- ==== PLACEHOLDER: ошибка поиска ==== -->
+    <LinearLayout
+        android:id="@+id/errorPlaceholder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/searchContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="102dp">
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            style="@style/IconErrorInternet"
+        android:contentDescription="@string/search_hint"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/server_error"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:textSize="19sp"
+            style="@style/TextErrorInternet"
+            android:paddingTop="16dp"
+            android:gravity="center"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/retryButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/BottomUpdateErrorInternet"
+            android:textSize="14sp"
+            android:text="@string/retry"
+            android:layout_marginTop="24dp"
+            app:backgroundTint="@null"/>
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tracksRecyclerView"
