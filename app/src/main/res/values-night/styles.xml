@@ -98,4 +98,35 @@
         <item name="android:tint">?attr/colorOnSurface</item>
     </style>
 
+
+    <style name="IconNoTrack">
+        <item name="android:src">@drawable/ic_no_results_dark</item>
+    </style>
+
+    <style name="TextNoTrack">
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="IconErrorInternet">
+        <item name="android:src">@drawable/ic_server_error_dark</item>
+    </style>
+
+    <style name="TextErrorInternet">
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="BottomUpdateErrorInternet" parent="Widget.MaterialComponents.Button">
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="android:background">@drawable/bg_white_button</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/YP_Black</item>
+    </style>
+
+
+
 </resources>

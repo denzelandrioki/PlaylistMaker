@@ -27,4 +27,9 @@
     <string name="search_hint">Поиск</string>
     <string name="clear">Очистить запрос</string>
     <string name="back">назад</string>
+
+
+    <string name="no_tracks_found">Ничего не нашлось</string>
+    <string name="server_error">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
+    <string name="retry">Обновить</string>
 </resources>
