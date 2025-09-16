@@ -16,6 +16,8 @@
     <color name="share_icon_search">#AEAFB4</color>
     <color name="YP_Text_Gray">#AEAFB4</color>
 
+    <color name="history_btn_bg">#1A1B22</color>
+    <color name="history_btn_text">#FFFFFF</color>
 
 
     <!-- Дополнительные цвета для дневной темы -->
