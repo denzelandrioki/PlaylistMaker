@@ -7,6 +7,8 @@ import android.text.TextWatcher
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.view.View
+import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -26,8 +28,11 @@ class SearchActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySearchBinding
     private lateinit var tracksAdapter: TracksAdapter
+    private lateinit var historyAdapter: TracksAdapter
+    private lateinit var history: SearchHistory
     private var searchText: String? = null
     private var lastSearchQuery: String? = null
+    private var runningCall: Call<PlaylistApiResponse>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,38 +40,47 @@ class SearchActivity : AppCompatActivity() {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val toolbar = binding.root.findViewById<MaterialToolbar>(R.id.searchToolbar)
+        // Toolbar
+        val toolbar = binding.searchToolbar
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
 
-        // Восстанавливаем текст из состояния, если оно было сохранено
-        savedInstanceState?.let {
-            searchText = it.getString(KEY_SEARCH_TEXT)
-        }
+        // История — ДОЛЖНА быть до первого использования!
+        history = SearchHistory(getSharedPreferences(SearchHistory.PREFS_NAME, MODE_PRIVATE))
 
-        // Устанавливаем восстановленный текст в EditText
+        // Восстановим текст
+        savedInstanceState?.let { searchText = it.getString(KEY_SEARCH_TEXT) }
         binding.searchEditText.setText(searchText)
 
-        // TextWatcher для показа/скрытия clearButton
-        binding.searchEditText.addTextChangedListener(textWatcher)
+        // Адаптеры
+        tracksAdapter = TracksAdapter(mutableListOf()) { onTrackClicked(it) }
+        binding.tracksRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.tracksRecyclerView.adapter = tracksAdapter
 
-        // Кнопка очистки
+        historyAdapter = TracksAdapter(mutableListOf()) { onTrackClicked(it) }
+        binding.historyRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.historyRecyclerView.adapter = historyAdapter
+
+        // Листенеры (по одному разу)
+        binding.searchEditText.addTextChangedListener(textWatcher)
+        binding.searchEditText.setOnFocusChangeListener { _, _ -> updateHistoryVisibility() }
+
         binding.clearButton.setOnClickListener {
             binding.searchEditText.text?.clear()
             binding.searchEditText.clearFocus()
             hideKeyboard()
             clearSearchResultViews()
+            updateHistoryVisibility()
         }
 
-        // Инициализация адаптера и RecyclerView
-        tracksAdapter = TracksAdapter(mutableListOf())
-        binding.tracksRecyclerView.layoutManager = LinearLayoutManager(this)
-        binding.tracksRecyclerView.adapter = tracksAdapter
+        binding.clearHistoryButton.setOnClickListener {
+            history.clear()
+            updateHistoryVisibility()
+        }
 
-        // Обработка нажатия "Done" на клавиатуре
         binding.searchEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE) {
                 val query = binding.searchEditText.text.toString().trim()
                 if (query.isNotEmpty()) {
                     performSearch(query)
@@ -76,21 +90,49 @@ class SearchActivity : AppCompatActivity() {
             } else false
         }
 
-        // Кнопка retry (для errorPlaceholder)
-        binding.retryButton.setOnClickListener {
-            lastSearchQuery?.let { performSearch(it) }
+        binding.retryButton.setOnClickListener { lastSearchQuery?.let { performSearch(it) } }
+
+        // Показать историю сразу при входе (без всплытия клавиатуры)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+        if (binding.searchEditText.text.isNullOrEmpty() && history.notEmpty()) {
+            binding.searchEditText.requestFocus()
+            binding.searchEditText.post { updateHistoryVisibility() }
+        } else {
+            updateHistoryVisibility()
         }
     }
 
+
     private val textWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            searchText = s.toString()
+            searchText = s?.toString()
             binding.clearButton.isVisible = !s.isNullOrEmpty()
+            updateHistoryVisibility()
         }
-
         override fun afterTextChanged(s: Editable?) {}
+    }
+
+    private fun onTrackClicked(track: Track) {
+        history.add(track)                     // <— сохранить/поднять в историю
+        Toast.makeText(this, "${track.trackName} — ${track.artistName}", Toast.LENGTH_SHORT).show()
+        // TODO: В следующем спринте — переход в плеер
+    }
+
+
+    private fun updateHistoryVisibility() {
+        val show = binding.searchEditText.hasFocus()
+                && binding.searchEditText.text.isNullOrEmpty()
+                && history.notEmpty()
+
+        binding.historyGroup.isVisible = show
+        if (show) {
+            historyAdapter.setData(history.get())
+            // Когда открыта история — прячем результаты/плейсхолдеры
+            binding.tracksRecyclerView.visibility = View.GONE
+            binding.emptyPlaceholder.visibility = View.GONE
+            binding.errorPlaceholder.visibility = View.GONE
+        }
     }
 
     private fun hideKeyboard() {
@@ -119,39 +161,31 @@ class SearchActivity : AppCompatActivity() {
 
     private fun performSearch(query: String) {
         lastSearchQuery = query
-        // Скрываем старые результаты, плейсхолдеры
         clearSearchResultViews()
-
-        // Тут можешь показать ProgressBar (если захочешь)
-
-        NetworkClient.itunesApi.searchTracks(query)
-            .enqueue(object : Callback<PlaylistApiResponse> {
+        runningCall?.cancel()
+        runningCall = NetworkClient.itunesApi.searchTracks(query).also { call ->
+            call.enqueue(object : Callback<PlaylistApiResponse> {
                 override fun onResponse(
-                    call: Call<PlaylistApiResponse>,
+                    c: Call<PlaylistApiResponse>,
                     response: Response<PlaylistApiResponse>
                 ) {
-                    if (response.isSuccessful && response.body() != null) {
-                        val tracks = response.body()!!.results
-                            ?.mapNotNull { it.toDomain() }
-                            ?: emptyList()
-
-                        if (tracks.isEmpty()) {
-                            showEmptyPlaceholder()
-                        } else {
-                            showTracks(tracks)
-                        }
-                    } else {
-                        showErrorPlaceholder()
+                    if (!isFinishing && !isDestroyed) {
+                        if (response.isSuccessful && response.body() != null) {
+                            val tracks = response.body()!!.results?.mapNotNull { it.toDomain() }.orEmpty()
+                            if (tracks.isEmpty()) showEmptyPlaceholder() else showTracks(tracks)
+                        } else showErrorPlaceholder()
                     }
                 }
-
-                override fun onFailure(call: Call<PlaylistApiResponse>, t: Throwable) {
-                    showErrorPlaceholder()
+                override fun onFailure(c: Call<PlaylistApiResponse>, t: Throwable) {
+                    if (c.isCanceled) return
+                    if (!isFinishing && !isDestroyed) showErrorPlaceholder()
                 }
             })
+        }
     }
 
     private fun showTracks(tracks: List<Track>) {
+        binding.historyGroup.visibility = View.GONE
         binding.emptyPlaceholder.visibility = View.GONE
         binding.errorPlaceholder.visibility = View.GONE
         binding.tracksRecyclerView.visibility = View.VISIBLE
@@ -179,5 +213,11 @@ class SearchActivity : AppCompatActivity() {
 
     companion object {
         private const val KEY_SEARCH_TEXT = "KEY_SEARCH_TEXT"
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        updateHistoryVisibility()
     }
 }

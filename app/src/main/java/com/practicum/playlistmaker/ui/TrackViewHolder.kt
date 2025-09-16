@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.ui
 
+import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,13 +23,15 @@ class TrackViewHolder private constructor(itemView: View) :
 
     fun bind(track: Track) {
         trackName.text  = track.trackName
-        subtitle.text   = "${track.artistName} · ${track.trackTime}"
+        val mmss = DateUtils.formatElapsedTime(track.trackTimeMillis / 1000)
+        subtitle.text   = "${track.artistName} · $mmss"
 
 
 
         val radius = itemView.resources.getDimensionPixelSize(R.dimen.track_cover_radius)
+        val coverUrl = track.artworkUrl100.replace("100x100bb.jpg", "512x512bb.jpg")
         Glide.with(itemView)
-            .load(track.artworkUrl100)
+            .load(coverUrl)
             .placeholder(R.drawable.img_placeholder)
             .error(R.drawable.img_placeholder)
             .transform(RoundedCorners(radius))

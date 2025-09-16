@@ -35,22 +35,36 @@ class SettingsActivity : AppCompatActivity() {
         // 2) Обрабатываем клик на значок «назад»
         toolbar.setNavigationOnClickListener { finish() }
 
-        // Применим сохраненное состояние или установим по умолчанию (например, дневной режим)
-        // Можно сохранить выбор пользователя в SharedPreferences, но для примера установим дневной режим
-        darkThemeSwitch.isChecked = (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES)
 
-        // Обработка переключения темы
+        // Инициализация свитча из Application
+        val app = applicationContext as App
+        darkThemeSwitch.isChecked = app.darkTheme
+
+
+        // Сохранение + применение темы на весь процесс
         darkThemeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                // Включаем ночной режим
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            } else {
-                // Включаем дневной режим
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
-            // При смене темы активность может быть перезапущена для применения изменений
-            // Возможно, понадобится закрыть текущую активность и открыть её заново для полного обновления UI
+            app.switchTheme(isChecked)
         }
+
+
+//        // Применим сохраненное состояние или установим по умолчанию (например, дневной режим)
+//        // Можно сохранить выбор пользователя в SharedPreferences, но для примера установим дневной режим
+//        darkThemeSwitch.isChecked = (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES)
+
+//        // Обработка переключения темы
+//        darkThemeSwitch.setOnCheckedChangeListener { _, isChecked ->
+//            if (isChecked) {
+//                // Включаем ночной режим
+//                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+//            } else {
+//                // Включаем дневной режим
+//                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+//            }
+//            // При смене темы активность может быть перезапущена для применения изменений
+//            // Возможно, понадобится закрыть текущую активность и открыть её заново для полного обновления UI
+//        }
+
+
 
 
         // Находим кнопки по id

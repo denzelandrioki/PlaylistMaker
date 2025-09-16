@@ -10,6 +10,10 @@
     <color name="share_back_icon_tint">#FFFFFF</color>
     <color name="share_icon_search">#1A1B22</color>
 
+
+    <color name="history_btn_bg">#FFFFFF</color>
+    <color name="history_btn_text">#1A1B22</color>
+
     <!-- Дополнительные цвета для ночной темы -->
 
     <color name="searchField_light">#E7EAF2</color>
