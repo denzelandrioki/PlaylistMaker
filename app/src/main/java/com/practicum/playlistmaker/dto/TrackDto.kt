@@ -1,9 +1,12 @@
 package com.practicum.playlistmaker.dto
 
+import android.os.Parcelable
 import com.practicum.playlistmaker.model.Track
+import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+@Parcelize
 data class TrackDto(
     val trackId: Long?,
     val trackName: String?,
@@ -14,7 +17,11 @@ data class TrackDto(
     val releaseDate: String?,        // iTunes ISO
     val primaryGenreName: String?,
     val country: String?
-)
+) : Parcelable {
+
+    fun getCoverArtwork(): String? =
+        artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg")
+}
 
 fun TrackDto.toDomain(): Track? {
     // Игнорируем треки без обязательных данных
