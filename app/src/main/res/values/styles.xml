@@ -44,6 +44,21 @@
         <item name="android:textFontWeight">500</item>
     </style>
 
+    <style name="TrackNameStyle">
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:textSize">@dimen/title_size</item>
+        <item name="android:textColor">@color/YP_Black</item>
+    </style>
+
+    <style name="TrackArtistStyle">
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:textSize">@dimen/artist_name_size</item>
+        <item name="android:textColor">@color/YP_Black</item>
+    </style>
+
+
 
     <style name="TitleHistoryStyle" parent="TextAppearance.Material3.TitleMedium">
         <item name="android:layout_width">match_parent</item>

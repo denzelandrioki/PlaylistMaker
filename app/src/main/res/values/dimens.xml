@@ -7,6 +7,7 @@
     <dimen name="button_history_size">14sp</dimen>
     <dimen name="history_start">13dp</dimen>
     <dimen name="history_end">12dp</dimen>
+    <dimen name="artist_name_size">14sp</dimen>
 
     <dimen name="text_size">18sp</dimen>
     <dimen name="button_text_size">18sp</dimen>

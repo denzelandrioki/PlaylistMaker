@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -40,6 +41,9 @@ class SearchActivity : AppCompatActivity() {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
+
+
         // Toolbar
         val toolbar = binding.searchToolbar
         setSupportActionBar(toolbar)
@@ -65,6 +69,19 @@ class SearchActivity : AppCompatActivity() {
         // Листенеры (по одному разу)
         binding.searchEditText.addTextChangedListener(textWatcher)
         binding.searchEditText.setOnFocusChangeListener { _, _ -> updateHistoryVisibility() }
+
+
+        // Твой крестик-иконка очистки (если используешь отдельную кнопку)
+        binding.clearButton.setOnClickListener {
+            // 1) чистим текст
+            binding.searchEditText.text?.clear()
+            // 2) оставляем/возвращаем фокус в поле
+            binding.searchEditText.requestFocus()
+            // 3) прячем результаты и показываем историю
+            clearSearchResultViews()
+            // 4) клавиатуру НЕ скрываем — по дизайну поле активно
+            updateHistoryVisibility()
+        }
 
         binding.clearButton.setOnClickListener {
             binding.searchEditText.text?.clear()
@@ -100,6 +117,9 @@ class SearchActivity : AppCompatActivity() {
         } else {
             updateHistoryVisibility()
         }
+
+
+
     }
 
 
@@ -116,7 +136,8 @@ class SearchActivity : AppCompatActivity() {
     private fun onTrackClicked(track: Track) {
         history.add(track)                     // <— сохранить/поднять в историю
         Toast.makeText(this, "${track.trackName} — ${track.artistName}", Toast.LENGTH_SHORT).show()
-        // TODO: В следующем спринте — переход в плеер
+        val intent = Intent(this, PlayerActivity::class.java).putExtra(PlayerActivity.EXTRA_TRACK, track)
+        startActivity(intent)
     }
 
 

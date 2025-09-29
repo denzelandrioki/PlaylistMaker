@@ -9,7 +9,11 @@ data class TrackDto(
     val trackName: String?,
     val artistName: String?,
     val trackTimeMillis: Long?,
-    val artworkUrl100: String?
+    val artworkUrl100: String?,
+    val collectionName: String?,
+    val releaseDate: String?,        // iTunes ISO
+    val primaryGenreName: String?,
+    val country: String?
 )
 
 fun TrackDto.toDomain(): Track? {
@@ -20,6 +24,10 @@ fun TrackDto.toDomain(): Track? {
         trackName = trackName,
         artistName = artistName,
         trackTimeMillis = trackTimeMillis,
-        artworkUrl100 = artworkUrl100 ?: ""
+        artworkUrl100 = artworkUrl100.orEmpty(),
+        collectionName = collectionName,
+        releaseDate = releaseDate,
+        primaryGenreName = primaryGenreName,
+        country = country
     )
 }
