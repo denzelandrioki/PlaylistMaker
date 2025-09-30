@@ -29,7 +29,7 @@ data class Track(
         (trackTimeMillis ?: 0L).let { ms ->
             val m = (ms / 1000) / 60
             val s = (ms / 1000) % 60
-            "%d:%02d".format(m, s)
+            "%02d:%02d".format(m, s)
         }
 
     fun releaseYear(): String? =

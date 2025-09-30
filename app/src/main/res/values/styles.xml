@@ -18,7 +18,7 @@
         <item name="android:fontFamily">@font/ys_display_regular</item>
         <item name="android:textFontWeight">400</item>
         <item name="android:textSize">@dimen/no_title_text_size</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">@color/YP_Black</item>
     </style>
 
 
@@ -100,7 +100,7 @@
         <item name="android:gravity">center</item>
         <item name="android:orientation">horizontal</item>
         <item name="android:padding">@dimen/screen_padding</item>
-        <item name="iconTint">@color/black</item>
+        <item name="iconTint">@color/YP_Black</item>
         <item name="android:fontFamily">@font/ys_display_medium</item>
         <item name="android:textFontWeight">500</item>
 
