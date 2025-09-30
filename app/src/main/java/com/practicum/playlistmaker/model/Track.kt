@@ -1,8 +1,11 @@
 package com.practicum.playlistmaker.model
 
+import android.os.Parcelable
 import android.text.format.DateUtils
+import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
+@Parcelize
 data class Track(
     val trackId: Long,
     val trackName: String,
@@ -17,15 +20,19 @@ data class Track(
     val releaseDate: String? = null,        // ISO-строка от iTunes, достанем год
     val primaryGenreName: String? = null,   // жанр
     val country: String? = null             // страна
-) : Serializable {
+) : Parcelable {
 
-    // mm:ss из миллисекунд
-    fun durationMmSs(): String = DateUtils.formatElapsedTime(trackTimeMillis / 1000)
+    fun getCoverArtwork(): String? =
+        artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg")
 
-    // 512x512 для плеера
-    fun getCoverArtwork(): String = artworkUrl100.replaceAfterLast('/', "512x512bb.jpg")
+    fun durationMmSs(): String =
+        (trackTimeMillis ?: 0L).let { ms ->
+            val m = (ms / 1000) / 60
+            val s = (ms / 1000) % 60
+            "%d:%02d".format(m, s)
+        }
 
-    // "1965" из "1965-08-23T07:00:00Z"
-    fun releaseYear(): String? = releaseDate?.takeIf { it.length >= 4 }?.substring(0, 4)
+    fun releaseYear(): String? =
+        releaseDate?.takeIf { it.length >= 4 }?.substring(0, 4)
 
 }

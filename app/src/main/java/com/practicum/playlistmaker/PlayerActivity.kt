@@ -1,10 +1,11 @@
 package com.practicum.playlistmaker
 
-import android.os.Build
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.databinding.ActivityPlayerBinding
 import com.practicum.playlistmaker.model.Track
@@ -19,54 +20,46 @@ class PlayerActivity : AppCompatActivity() {
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Кнопка "назад"
+        // Кнопка «назад»
         binding.playerToolbar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
 
-        // Получаем трек из Intent (совместимо с API < 33 и >= 33)
-        val incoming: Track? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(EXTRA_TRACK, Track::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra(EXTRA_TRACK)
-        }
-
-        if (incoming == null) {
-            // Если по какой-то причине данных нет — закрываем экран аккуратно
+        // Получаем Parcelable трек (без падений на разных API)
+        track = intent.getParcelableExtraCompat(EXTRA_TRACK) ?: run {
+            // Нет данных — закрываем экран
             finish()
             return
         }
-        track = incoming
 
         bindTrack(track)
     }
 
     private fun bindTrack(track: Track) = with(binding) {
-        // Текстовые поля
+        // Основные поля
         titleText.text = track.trackName
         artistText.text = track.artistName
         durationValue.text = track.durationMmSs()
 
-        // Альбом (если нет — скрываем пару "лейбл/значение")
+        // Альбом (пара лейбл/значение)
         if (track.collectionName.isNullOrBlank()) {
             albumLabel.visibility = View.GONE
             albumValue.visibility = View.GONE
         } else {
-            albumValue.text = track.collectionName
             albumLabel.visibility = View.VISIBLE
             albumValue.visibility = View.VISIBLE
+            albumValue.text = track.collectionName
         }
 
-        // Год (releaseDate -> год или скрыть)
+        // Год (из releaseDate)
         val year = track.releaseYear()
         if (year.isNullOrBlank()) {
             yearLabel.visibility = View.GONE
             yearValue.visibility = View.GONE
         } else {
-            yearValue.text = year
             yearLabel.visibility = View.VISIBLE
             yearValue.visibility = View.VISIBLE
+            yearValue.text = year
         }
 
         // Жанр
@@ -74,9 +67,9 @@ class PlayerActivity : AppCompatActivity() {
             genreLabel.visibility = View.GONE
             genreValue.visibility = View.GONE
         } else {
-            genreValue.text = track.primaryGenreName
             genreLabel.visibility = View.VISIBLE
             genreValue.visibility = View.VISIBLE
+            genreValue.text = track.primaryGenreName
         }
 
         // Страна
@@ -84,15 +77,15 @@ class PlayerActivity : AppCompatActivity() {
             countryLabel.visibility = View.GONE
             countryValue.visibility = View.GONE
         } else {
-            countryValue.text = track.country
             countryLabel.visibility = View.VISIBLE
             countryValue.visibility = View.VISIBLE
+            countryValue.text = track.country
         }
 
-        // Обложка 512×512 (или плейсхолдер)
+        // Обложка 512×512 c CenterCrop + скругление
         loadCover(track.getCoverArtwork())
 
-        // Кнопку Play пока оставляем активной (реализация — в следующем спринте)
+        // Функционал плеера реализуем позже
         playBtn.isEnabled = true
     }
 
@@ -102,9 +95,18 @@ class PlayerActivity : AppCompatActivity() {
             .load(url)
             .placeholder(R.drawable.img_placeholder)
             .error(R.drawable.img_placeholder)
-            .transform(RoundedCorners(radius))
+            .transform(CenterCrop(), RoundedCorners(radius))
             .into(binding.coverImage)
     }
+
+    /** Удобная cross-API функция получения Parcelable */
+    private fun Intent.getParcelableExtraCompat(key: String): Track? =
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            getParcelableExtra(key, Track::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            getParcelableExtra(key)
+        }
 
     companion object {
         const val EXTRA_TRACK = "extra_track"

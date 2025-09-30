@@ -136,7 +136,8 @@ class SearchActivity : AppCompatActivity() {
     private fun onTrackClicked(track: Track) {
         history.add(track)                     // <— сохранить/поднять в историю
         Toast.makeText(this, "${track.trackName} — ${track.artistName}", Toast.LENGTH_SHORT).show()
-        val intent = Intent(this, PlayerActivity::class.java).putExtra(PlayerActivity.EXTRA_TRACK, track)
+        val intent = Intent(this, PlayerActivity::class.java)
+            .putExtra(PlayerActivity.EXTRA_TRACK, track)
         startActivity(intent)
     }
 
