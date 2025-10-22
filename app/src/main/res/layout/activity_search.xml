@@ -69,6 +69,7 @@
             android:contentDescription="@string/clear"
             android:visibility="gone"
             app:tint="?attr/searchIconTint" />
+
     </FrameLayout>
 
 
@@ -193,5 +194,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Индикатор загрузки -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/searchContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="140dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

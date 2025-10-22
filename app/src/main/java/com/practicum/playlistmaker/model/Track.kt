@@ -4,6 +4,9 @@ import android.os.Parcelable
 import android.text.format.DateUtils
 import kotlinx.parcelize.Parcelize
 import java.io.Serializable
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.TimeZone
 
 @Parcelize
 data class Track(
@@ -19,18 +22,16 @@ data class Track(
     val collectionName: String? = null,     // альбом (может быть null)
     val releaseDate: String? = null,        // ISO-строка от iTunes, достанем год
     val primaryGenreName: String? = null,   // жанр
-    val country: String? = null             // страна
+    val country: String? = null, // страна
+    val previewUrl: String?
 ) : Parcelable {
 
     fun getCoverArtwork(): String? =
         artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg")
 
     fun durationMmSs(): String =
-        (trackTimeMillis ?: 0L).let { ms ->
-            val m = (ms / 1000) / 60
-            val s = (ms / 1000) % 60
-            "%02d:%02d".format(m, s)
-        }
+        SimpleDateFormat("mm:ss", Locale.getDefault()).apply { timeZone = TimeZone.getTimeZone("UTC") }
+            .format(trackTimeMillis ?: 0L)
 
     fun releaseYear(): String? =
         releaseDate?.takeIf { it.length >= 4 }?.substring(0, 4)
