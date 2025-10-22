@@ -3,6 +3,8 @@ package com.practicum.playlistmaker
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.inputmethod.EditorInfo
@@ -35,6 +37,17 @@ class SearchActivity : AppCompatActivity() {
     private var lastSearchQuery: String? = null
     private var runningCall: Call<PlaylistApiResponse>? = null
 
+
+
+    private val searchHandler = Handler(Looper.getMainLooper())
+    private var searchRunnable: Runnable? = null
+    private val SEARCH_DEBOUNCE_MS = 2000L
+
+    private val clickHandler = Handler(Looper.getMainLooper())
+    private var clickAllowed = true
+    private val CLICK_DEBOUNCE_MS = 1000L
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -58,11 +71,11 @@ class SearchActivity : AppCompatActivity() {
         binding.searchEditText.setText(searchText)
 
         // Адаптеры
-        tracksAdapter = TracksAdapter(mutableListOf()) { onTrackClicked(it) }
+        tracksAdapter = TracksAdapter(mutableListOf()) { onTrackClickedSafe(it) }
         binding.tracksRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.tracksRecyclerView.adapter = tracksAdapter
 
-        historyAdapter = TracksAdapter(mutableListOf()) { onTrackClicked(it) }
+        historyAdapter = TracksAdapter(mutableListOf()) { onTrackClickedSafe(it) }
         binding.historyRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.historyRecyclerView.adapter = historyAdapter
 
@@ -129,6 +142,19 @@ class SearchActivity : AppCompatActivity() {
             searchText = s?.toString()
             binding.clearButton.isVisible = !s.isNullOrEmpty()
             updateHistoryVisibility()
+
+
+            // дебаунсим запрос
+            searchRunnable?.let { searchHandler.removeCallbacks(it) }
+            val query = s?.toString()?.trim().orEmpty()
+            if (query.isNotEmpty()) {
+                searchRunnable = Runnable { performSearch(query) }
+                searchHandler.postDelayed(searchRunnable!!, SEARCH_DEBOUNCE_MS)
+            } else {
+                // пусто — убираем список, прячем прогресс
+                clearSearchResultViews()
+                binding.progressBar.visibility = View.GONE
+            }
         }
         override fun afterTextChanged(s: Editable?) {}
     }
@@ -139,6 +165,16 @@ class SearchActivity : AppCompatActivity() {
         val intent = Intent(this, PlayerActivity::class.java)
             .putExtra(PlayerActivity.EXTRA_TRACK, track)
         startActivity(intent)
+    }
+
+
+    // Клик-debounce
+    private fun onTrackClickedSafe(track: Track) {
+        if (!clickAllowed) return
+        clickAllowed = false
+        clickHandler.postDelayed({ clickAllowed = true }, CLICK_DEBOUNCE_MS)
+
+        onTrackClicked(track) // ваш существующий метод (история + Toast + старт PlayerActivity)
     }
 
 
@@ -178,12 +214,16 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         binding.searchEditText.removeTextChangedListener(textWatcher)
+        searchRunnable?.let { searchHandler.removeCallbacks(it) }
+        clickHandler.removeCallbacksAndMessages(null)
         super.onDestroy()
     }
 
     private fun performSearch(query: String) {
         lastSearchQuery = query
         clearSearchResultViews()
+        binding.progressBar.visibility = View.VISIBLE
+
         runningCall?.cancel()
         runningCall = NetworkClient.itunesApi.searchTracks(query).also { call ->
             call.enqueue(object : Callback<PlaylistApiResponse> {
@@ -191,6 +231,7 @@ class SearchActivity : AppCompatActivity() {
                     c: Call<PlaylistApiResponse>,
                     response: Response<PlaylistApiResponse>
                 ) {
+                    binding.progressBar.visibility = View.GONE
                     if (!isFinishing && !isDestroyed) {
                         if (response.isSuccessful && response.body() != null) {
                             val tracks = response.body()!!.results?.mapNotNull { it.toDomain() }.orEmpty()
@@ -198,7 +239,9 @@ class SearchActivity : AppCompatActivity() {
                         } else showErrorPlaceholder()
                     }
                 }
+
                 override fun onFailure(c: Call<PlaylistApiResponse>, t: Throwable) {
+                    binding.progressBar.visibility = View.GONE
                     if (c.isCanceled) return
                     if (!isFinishing && !isDestroyed) showErrorPlaceholder()
                 }

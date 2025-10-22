@@ -16,7 +16,8 @@ data class TrackDto(
     val collectionName: String?,
     val releaseDate: String?,        // iTunes ISO
     val primaryGenreName: String?,
-    val country: String?
+    val country: String?,
+    val previewUrl: String?
 ) : Parcelable {
 
     fun getCoverArtwork(): String? =
@@ -35,6 +36,7 @@ fun TrackDto.toDomain(): Track? {
         collectionName = collectionName,
         releaseDate = releaseDate,
         primaryGenreName = primaryGenreName,
-        country = country
+        country = country,
+        previewUrl = previewUrl
     )
 }
