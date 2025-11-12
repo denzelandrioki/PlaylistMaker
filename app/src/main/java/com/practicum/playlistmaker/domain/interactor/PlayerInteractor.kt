@@ -1,59 +1,35 @@
 package com.practicum.playlistmaker.domain.interactor
 
-import android.os.Handler
-import android.os.Looper
+import com.practicum.playlistmaker.domain.entity.PlayerState
 import com.practicum.playlistmaker.domain.repository.PlayerRepository
-import java.text.SimpleDateFormat
-import java.util.*
 
-class PlayerInteractor(private val repo: PlayerRepository) {
+interface PlayerInteractor {
+    fun prepare(url: String, onPrepared: () -> Unit, onComplete: () -> Unit, onError: (Throwable) -> Unit = {})
+    fun play()
+    fun pause()
+    fun stop()
+    fun state(): PlayerState
+    fun currentPositionMs(): Int
+}
 
-    companion object { private const val PROGRESS_TICK_MS = 333L }
+class PlayerInteractorImpl(
+    private val repo: PlayerRepository
+) : PlayerInteractor {
 
-    private val ui = Handler(Looper.getMainLooper())
-    private val sdf = SimpleDateFormat("mm:ss", Locale.getDefault())
-    private var ticker: Runnable? = null
+    override fun prepare(
+        url: String,
+        onPrepared: () -> Unit,
+        onComplete: () -> Unit,
+        onError: (Throwable) -> Unit
+    ) = repo.prepare(url, onPrepared, onComplete, onError)
 
-    fun prepare(url: String?, onPrepared: () -> Unit, onCompletion: () -> Unit, onError: (Throwable)->Unit) =
-        repo.prepare(url, onPrepared = onPrepared, onCompletion = {
-            stopProgress()
-            onCompletion()
-        }, onError = onError)
+    override fun play() = repo.play()
 
-    fun play(onProgress: (String) -> Unit) {
-        repo.play()
-        startProgress(onProgress)
-    }
+    override fun pause() = repo.pause()
 
-    fun pause() {
-        repo.pause()
-        stopProgress()
-    }
+    override fun stop() = repo.stop()
 
-    fun toggle(onProgress: (String) -> Unit) {
-        when (repo.state()) {
-            com.practicum.playlistmaker.domain.entity.PlayerState.PLAYING -> pause()
-            com.practicum.playlistmaker.domain.entity.PlayerState.PAUSED,
-            com.practicum.playlistmaker.domain.entity.PlayerState.PREPARED,
-            com.practicum.playlistmaker.domain.entity.PlayerState.COMPLETED -> play(onProgress)
-            else -> {}
-        }
-    }
+    override fun state(): PlayerState = repo.state()
 
-    fun release() { stopProgress(); repo.release() }
-
-    private fun startProgress(onProgress: (String) -> Unit) {
-        if (ticker != null) return
-        ticker = object : Runnable {
-            override fun run() {
-                onProgress(sdf.format(repo.currentPositionMs()))
-                ui.postDelayed(this, PROGRESS_TICK_MS)
-            }
-        }.also { ui.post(it) }
-    }
-
-    fun stopProgress() {
-        ticker?.let { ui.removeCallbacks(it) }
-        ticker = null
-    }
+    override fun currentPositionMs(): Int = repo.currentPositionMs()
 }

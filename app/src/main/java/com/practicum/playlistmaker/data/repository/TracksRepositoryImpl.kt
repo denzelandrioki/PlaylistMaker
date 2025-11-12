@@ -1,11 +1,9 @@
 package com.practicum.playlistmaker.data.repository
 
-import android.os.Handler
-import android.os.Looper
+import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.practicum.playlistmaker.data.dto.SearchResponseDto
-import com.practicum.playlistmaker.data.local.PrefsStorage
 import com.practicum.playlistmaker.data.mapper.TrackMapper
 import com.practicum.playlistmaker.data.network.ItunesApi
 import com.practicum.playlistmaker.domain.entity.Track
@@ -16,53 +14,63 @@ import retrofit2.Response
 
 class TracksRepositoryImpl(
     private val api: ItunesApi,
-    private val prefs: PrefsStorage,
-    private val gson: Gson
+    private val mapper: TrackMapper,
+    private val gson: Gson,
+    private val prefs: SharedPreferences
 ) : TracksRepository {
-
-    companion object {
-        private const val KEY_HISTORY = "history_json"
-        private const val HISTORY_LIMIT = 10
-        private val MAIN = Handler(Looper.getMainLooper())
-        private val LIST_TYPE = object : TypeToken<MutableList<Track>>() {}.type
-    }
 
     override fun search(query: String, callback: (Result<List<Track>>) -> Unit) {
         api.search(query).enqueue(object : Callback<SearchResponseDto> {
-            override fun onResponse(call: Call<SearchResponseDto>, resp: Response<SearchResponseDto>) {
-                val dtos = resp.body()?.results.orEmpty()
-                val tracks = dtos.map(TrackMapper::fromDto)
-                MAIN.post { callback(Result.success(tracks)) }
+            override fun onResponse(
+                call: Call<SearchResponseDto>,
+                response: Response<SearchResponseDto>
+            ) {
+                if (!response.isSuccessful) {
+                    callback(Result.failure(IllegalStateException("HTTP ${response.code()}")))
+                    return
+                }
+                val body = response.body()
+                val list = body?.results.orEmpty().map { mapper.fromDto(it) }
+                callback(Result.success(list))
             }
+
             override fun onFailure(call: Call<SearchResponseDto>, t: Throwable) {
-                MAIN.post { callback(Result.failure(t)) }
+                callback(Result.failure(t))
             }
         })
     }
 
-    override fun getHistory(): List<Track> =
-        prefs.getString(KEY_HISTORY)?.let { json ->
-            runCatching { gson.fromJson<MutableList<Track>>(json, LIST_TYPE) }.getOrNull() ?: emptyList()
-        } ?: emptyList()
+    override fun getHistory(): List<Track> = readHistory()
 
     override fun addToHistory(track: Track) {
-        val list = getHistory().toMutableList().apply {
-            // убираем дубликат по trackId
-            removeAll { it.trackId == track.trackId }
-            // добавляем в начало
-            add(0, track)
-            // жёстко ограничиваем размер до HISTORY_LIMIT
-            if (size > HISTORY_LIMIT) {
-                // оставляем только первые HISTORY_LIMIT элементов
-                subList(HISTORY_LIMIT, size).clear()
-            }
-            // альтернатива без subList:
-            // while (size > HISTORY_LIMIT) removeAt(lastIndex)
+        val list = readHistory().toMutableList()
+        // убрать дубликаты по trackId
+        list.removeAll { it.trackId == track.trackId }
+        // ограничить размер (до 10): если переполнено — убрать последний элемент
+        if (list.size >= MAX_HISTORY && list.isNotEmpty()) {
+            list.removeAt(list.lastIndex) // <-- вместо removeLast() (API 35)
         }
-        prefs.putString(KEY_HISTORY, gson.toJson(list))
+        // добавить в начало
+        list.add(0, track)
+        writeHistory(list)
     }
 
-    override fun clearHistory() {
-        prefs.remove(KEY_HISTORY)
+    override fun clearHistory() = writeHistory(emptyList())
+
+    // --- приватные помощники ---
+    private fun readHistory(): List<Track> {
+        val json = prefs.getString(KEY_HISTORY, null) ?: return emptyList()
+        return runCatching { gson.fromJson<List<Track>>(json, typeTrackList) }
+            .getOrElse { emptyList() }
+    }
+
+    private fun writeHistory(list: List<Track>) {
+        prefs.edit().putString(KEY_HISTORY, gson.toJson(list, typeTrackList)).apply()
+    }
+
+    companion object {
+        private const val KEY_HISTORY = "search_history"
+        private const val MAX_HISTORY = 10
+        private val typeTrackList = object : TypeToken<List<Track>>() {}.type
     }
 }

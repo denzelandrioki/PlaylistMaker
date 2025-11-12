@@ -1,21 +1,17 @@
 package com.practicum.playlistmaker.presentation.player
 
 import android.content.Intent
-import android.media.AudioAttributes
-import android.media.MediaPlayer
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivityPlayerBinding
+import com.practicum.playlistmaker.domain.entity.PlayerState
 import com.practicum.playlistmaker.domain.entity.Track
-import com.practicum.playlistmaker.presentation.common.durationMmSs
-import com.practicum.playlistmaker.presentation.common.releaseYear
+import com.practicum.playlistmaker.app.Creator
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
@@ -25,20 +21,10 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
     private lateinit var track: Track
 
-    private var mediaPlayer: MediaPlayer? = null
+    private val player by lazy { Creator.playerInteractor() }
 
-    private enum class State { DEFAULT, PREPARED, PLAYING, PAUSED }
-    private var state: State = State.DEFAULT
-
-    private val uiHandler = Handler(Looper.getMainLooper())
-    private val progressRunnable = object : Runnable {
-        override fun run() {
-            if (state == State.PLAYING) {
-                binding.progressText.text = formatMs(mediaPlayer?.currentPosition ?: 0)
-                uiHandler.postDelayed(this, PROGRESS_UPDATE_INTERVAL_MS)
-            }
-        }
-    }
+    private val uiHandler by lazy { Handler(Looper.getMainLooper()) }
+    private var progressRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,161 +32,156 @@ class PlayerActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.playerToolbar.setNavigationOnClickListener {
-            stopAndRelease()
             onBackPressedDispatcher.onBackPressed()
         }
 
-        track = intent.getParcelableExtraCompat(EXTRA_TRACK)
-            ?: error("PlayerActivity: Track extra is missing")
+        track = intent.getParcelableExtraCompat(EXTRA_TRACK) ?: error("Track extra is missing")
 
         bindTrack(track)
-        preparePlayer(track.previewUrl)
+
+        player.prepare(
+            url = track.previewUrl.orEmpty(),
+            onPrepared = { /* отрывок 30с — длительность не нужна */ },
+            onComplete = { onCompletion() },
+            onError = { onCompletion() } // на ошибке сбрасываем UI
+        )
 
         binding.playBtn.setOnClickListener {
-            when (state) {
-                State.PREPARED, State.PAUSED -> startPlayback()
-                State.PLAYING -> pausePlayback()
-                else -> Unit
+            when (player.state()) {
+                PlayerState.PLAYING   -> pause()
+                PlayerState.PAUSED,
+                PlayerState.PREPARED,
+                PlayerState.COMPLETED -> play()
+                PlayerState.IDLE,
+                PlayerState.ERROR     -> play()  // делаем попытку воспроизведения
             }
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        if (state == State.PLAYING) pausePlayback()
-    }
+    private fun bindTrack(track: Track) = with(binding) {
+        titleText.text = track.trackName
+        artistText.text = track.artistName
+        // Long -> Int
+        durationValue.text = formatMs((track.trackTimeMillis ?: 0L).toInt())
 
-    override fun onDestroy() {
-        super.onDestroy()
-        stopTimer()
-        stopAndRelease()
-    }
-
-    private fun preparePlayer(previewUrl: String?) {
-        if (previewUrl.isNullOrBlank()) {
-            binding.playBtn.isEnabled = false
-            return
-        }
-        mediaPlayer = MediaPlayer().apply {
-            setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .build()
-            )
-            setDataSource(previewUrl)
-            setOnPreparedListener {
-                state = State.PREPARED
-                binding.playBtn.isEnabled = true
-                binding.progressText.text = formatMs(0)
-            }
-            setOnCompletionListener {
-                state = State.PREPARED
-                setPlayIcon()
-                stopTimer()
-                binding.progressText.text = formatMs(0)
-                seekTo(0)
-            }
-            prepareAsync()
-        }
-        binding.playBtn.isEnabled = false
-    }
-
-    private fun startPlayback() {
-        mediaPlayer?.start()
-        state = State.PLAYING
-        setPauseIcon()
-        startTimer()
-    }
-
-    private fun pausePlayback() {
-        mediaPlayer?.pause()
-        state = State.PAUSED
-        setPlayIcon()
-        stopTimer()
-    }
-
-    private fun stopAndRelease() {
-        mediaPlayer?.run {
-            stopTimer()
-            try { stop() } catch (_: Throwable) {}
-            release()
-        }
-        mediaPlayer = null
-        state = State.DEFAULT
-    }
-
-    private fun startTimer() {
-        uiHandler.removeCallbacks(progressRunnable)
-        uiHandler.post(progressRunnable)
-    }
-
-    private fun stopTimer() {
-        uiHandler.removeCallbacks(progressRunnable)
-    }
-
-    private fun bindTrack(t: Track) = with(binding) {
-        titleText.text = t.trackName
-        artistText.text = t.artistName
-        durationValue.text = t.durationMmSs()
-
-        if (t.collectionName.isNullOrBlank()) {
-            albumLabel.visibility = View.GONE; albumValue.visibility = View.GONE
+        // Альбом
+        if (track.collectionName.isNullOrBlank()) {
+            albumLabel.visibility = android.view.View.GONE
+            albumValue.visibility = android.view.View.GONE
         } else {
-            albumLabel.visibility = View.VISIBLE
-            albumValue.visibility = View.VISIBLE
-            albumValue.text = t.collectionName
+            albumValue.text = track.collectionName
+            albumLabel.visibility = android.view.View.VISIBLE
+            albumValue.visibility = android.view.View.VISIBLE
         }
 
-        val year = t.releaseYear()
-        if (year == null) {
-            yearLabel.visibility = View.GONE; yearValue.visibility = View.GONE
+        // Год
+        val year = track.releaseDate?.takeIf { it.length >= 4 }?.substring(0, 4)
+        if (year.isNullOrBlank()) {
+            yearLabel.visibility = android.view.View.GONE
+            yearValue.visibility = android.view.View.GONE
         } else {
-            yearLabel.visibility = View.VISIBLE; yearValue.visibility = View.VISIBLE
             yearValue.text = year
+            yearLabel.visibility = android.view.View.VISIBLE
+            yearValue.visibility = android.view.View.VISIBLE
         }
 
-        if (t.primaryGenreName.isNullOrBlank()) {
-            genreLabel.visibility = View.GONE; genreValue.visibility = View.GONE
+        // Жанр
+        if (track.primaryGenreName.isNullOrBlank()) {
+            genreLabel.visibility = android.view.View.GONE
+            genreValue.visibility = android.view.View.GONE
         } else {
-            genreLabel.visibility = View.VISIBLE; genreValue.visibility = View.VISIBLE
-            genreValue.text = t.primaryGenreName
+            genreValue.text = track.primaryGenreName
+            genreLabel.visibility = android.view.View.VISIBLE
+            genreValue.visibility = android.view.View.VISIBLE
         }
 
-        if (t.country.isNullOrBlank()) {
-            countryLabel.visibility = View.GONE; countryValue.visibility = View.GONE
+        // Страна
+        if (track.country.isNullOrBlank()) {
+            countryLabel.visibility = android.view.View.GONE
+            countryValue.visibility = android.view.View.GONE
         } else {
-            countryLabel.visibility = View.VISIBLE; countryValue.visibility = View.VISIBLE
-            countryValue.text = t.country
+            countryValue.text = track.country
+            countryLabel.visibility = android.view.View.VISIBLE
+            countryValue.visibility = android.view.View.VISIBLE
         }
 
+        // Обложка 512×512 + скругления
         val radius = resources.getDimensionPixelSize(R.dimen.track_cover_radius)
         Glide.with(this@PlayerActivity)
-            .load(t.cover512())
+            .load(track.artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg"))
             .placeholder(R.drawable.img_placeholder)
             .error(R.drawable.img_placeholder)
             .transform(RoundedCorners(radius))
             .into(coverImage)
 
-        progressText.text = formatMs(0)
-        setPlayIcon()
-        playBtn.isEnabled = false
+        playBtn.isEnabled = true
+        playBtn.setImageResource(R.drawable.ic_play_32)
+        progressText.text = "00:00"
     }
 
-    private fun setPlayIcon() { binding.playBtn.setImageResource(R.drawable.ic_play_32) }
-    private fun setPauseIcon() { binding.playBtn.setImageResource(R.drawable.ic_pause_32) }
+    private fun play() {
+        player.play()
+        binding.playBtn.setImageResource(R.drawable.ic_pause_32)
+        startProgressTicker()
+    }
 
+    private fun pause() {
+        player.pause()
+        binding.playBtn.setImageResource(R.drawable.ic_play_32)
+        stopProgressTicker()
+    }
+
+    private fun onCompletion() {
+        stopProgressTicker()
+        binding.playBtn.setImageResource(R.drawable.ic_play_32)
+        binding.progressText.text = "00:00"
+    }
+
+    // ——— Тикер прогресса ———
+    private fun startProgressTicker() {
+        stopProgressTicker()
+        progressRunnable = object : Runnable {
+            override fun run() {
+                if (player.state() == PlayerState.PLAYING) {
+                    binding.progressText.text = formatMs(player.currentPositionMs())
+                    uiHandler.postDelayed(this, PROGRESS_TICK_MS)
+                }
+            }
+        }.also { uiHandler.post(it) }
+    }
+
+    private fun stopProgressTicker() {
+        progressRunnable?.let { uiHandler.removeCallbacks(it) }
+        progressRunnable = null
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (player.state() == PlayerState.PLAYING) pause()
+    }
+
+    override fun onDestroy() {
+        stopProgressTicker()
+        player.stop()
+        super.onDestroy()
+    }
+
+    // ——— helpers ———
     private fun formatMs(ms: Int): String =
-        SimpleDateFormat("mm:ss", Locale.getDefault())
-            .apply { timeZone = TimeZone.getTimeZone("UTC") }
-            .format(ms.toLong())
+        SimpleDateFormat("mm:ss", Locale.getDefault()).apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+        }.format(ms)
 
     private fun Intent.getParcelableExtraCompat(key: String): Track? =
-        if (Build.VERSION.SDK_INT >= 33) getParcelableExtra(key, Track::class.java)
-        else @Suppress("DEPRECATION") getParcelableExtra(key)
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            getParcelableExtra(key, Track::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            getParcelableExtra(key)
+        }
 
     companion object {
         const val EXTRA_TRACK = "extra_track"
-        private const val PROGRESS_UPDATE_INTERVAL_MS = 333L
+        private const val PROGRESS_TICK_MS = 333L
     }
 }

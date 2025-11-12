@@ -12,22 +12,34 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.app.App
+import com.practicum.playlistmaker.app.Creator
 
 class SettingsActivity : AppCompatActivity() {
+
+    private val settings by lazy { Creator.settingsInteractor(this) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_settings)
 
-        val darkThemeSwitch = findViewById<SwitchMaterial>(R.id.darkThemeSwitch)
         val toolbar = findViewById<MaterialToolbar>(R.id.settingsToolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
 
+        val darkThemeSwitch = findViewById<SwitchMaterial>(R.id.darkThemeSwitch)
+
+        // читаем состояние темы из домена
+        val isDark = settings.isDarkTheme()
+        darkThemeSwitch.isChecked = isDark
+
+        // применяем тему через App + сохраняем через интерактор
         val app = applicationContext as App
-        darkThemeSwitch.isChecked = app.darkTheme
-        darkThemeSwitch.setOnCheckedChangeListener { _, isChecked -> app.switchTheme(isChecked) }
+        darkThemeSwitch.setOnCheckedChangeListener { _, checked ->
+            settings.setDarkTheme(checked) // домен: сохранить выбор
+            app.switchTheme(checked)       // presentation: применить визуально
+        }
 
         val shareButton = findViewById<MaterialTextView>(R.id.share_app_button)
         val supportButton = findViewById<MaterialTextView>(R.id.support_button)
@@ -47,8 +59,9 @@ class SettingsActivity : AppCompatActivity() {
             val body = getString(R.string.support_email_body)
             val mailto = "mailto:$email?subject=${Uri.encode(subject)}&body=${Uri.encode(body)}"
             val emailIntent = Intent(Intent.ACTION_SENDTO, Uri.parse(mailto))
-            try { startActivity(emailIntent) }
-            catch (_: ActivityNotFoundException) {
+            try {
+                startActivity(emailIntent)
+            } catch (_: ActivityNotFoundException) {
                 Toast.makeText(this, "Почтовый клиент не найден", Toast.LENGTH_SHORT).show()
             }
         }

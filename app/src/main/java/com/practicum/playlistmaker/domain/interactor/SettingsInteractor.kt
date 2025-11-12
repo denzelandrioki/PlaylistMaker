@@ -1,8 +1,17 @@
 package com.practicum.playlistmaker.domain.interactor
 
-import com.practicum.playlistmaker.domain.repository.SettingsRepository
+import com.practicum.playlistmaker.domain.repository.PrefsRepository
 
-class SettingsInteractor(private val repo: SettingsRepository) {
-    fun isDark() = repo.isDarkTheme()
-    fun setDark(enabled: Boolean) = repo.setDarkTheme(enabled)
+interface SettingsInteractor {
+    fun isDarkTheme(): Boolean
+    fun setDarkTheme(enabled: Boolean)
+}
+
+class SettingsInteractorImpl(
+    private val prefs: PrefsRepository
+) : SettingsInteractor {
+
+    override fun isDarkTheme(): Boolean = prefs.isDarkTheme()
+
+    override fun setDarkTheme(enabled: Boolean) = prefs.setDarkTheme(enabled)
 }

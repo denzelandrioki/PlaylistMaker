@@ -1,11 +1,20 @@
 package com.practicum.playlistmaker.data.local
 
 import android.content.SharedPreferences
+import com.practicum.playlistmaker.domain.repository.PrefsRepository
 
-class PrefsStorage(private val prefs: SharedPreferences) {
-    fun putString(key: String, value: String) = prefs.edit().putString(key, value).apply()
-    fun getString(key: String): String? = prefs.getString(key, null)
-    fun putBoolean(key: String, value: Boolean) = prefs.edit().putBoolean(key, value).apply()
-    fun getBoolean(key: String, def: Boolean = false): Boolean = prefs.getBoolean(key, def)
-    fun remove(key: String) = prefs.edit().remove(key).apply()
+class PrefsStorage(
+    private val prefs: SharedPreferences
+) : PrefsRepository {
+
+    companion object {
+        private const val KEY_DARK_THEME = "key_dark_theme"
+    }
+
+    override fun isDarkTheme(): Boolean =
+        prefs.getBoolean(KEY_DARK_THEME, false)
+
+    override fun setDarkTheme(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_DARK_THEME, enabled).apply()
+    }
 }
