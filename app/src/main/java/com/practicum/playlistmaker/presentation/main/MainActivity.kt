@@ -1,17 +1,17 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.presentation.main
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
+import com.practicum.playlistmaker.presentation.media.MediaActivity
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.presentation.search.SearchActivity
+import com.practicum.playlistmaker.presentation.settings.SettingsActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,13 +19,11 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        // автоматически подвинет вниз всё содержимое на высоту статус-бара
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val sys = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(v.paddingLeft, sys.top, v.paddingRight, v.paddingBottom)
             insets
         }
-
 
         val toolbar = findViewById<MaterialToolbar>(R.id.mainToolbar)
         setSupportActionBar(toolbar)
@@ -43,13 +41,9 @@ class MainActivity : AppCompatActivity() {
             val mediaIntent = Intent(this, MediaActivity::class.java)
             startActivity(mediaIntent)
         }
-
         settingButton.setOnClickListener{
             val settingIntent = Intent(this, SettingsActivity::class.java)
             startActivity(settingIntent)
         }
-
-
-
     }
 }

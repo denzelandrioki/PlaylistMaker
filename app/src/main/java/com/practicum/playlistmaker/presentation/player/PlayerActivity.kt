@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.presentation.player
 
 import android.content.Intent
 import android.media.AudioAttributes
@@ -11,10 +11,14 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivityPlayerBinding
-import com.practicum.playlistmaker.model.Track
+import com.practicum.playlistmaker.domain.entity.Track
+import com.practicum.playlistmaker.presentation.common.durationMmSs
+import com.practicum.playlistmaker.presentation.common.releaseYear
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
+import java.util.TimeZone
 
 class PlayerActivity : AppCompatActivity() {
 
@@ -31,8 +35,7 @@ class PlayerActivity : AppCompatActivity() {
         override fun run() {
             if (state == State.PLAYING) {
                 binding.progressText.text = formatMs(mediaPlayer?.currentPosition ?: 0)
-                // обновляем 3 раза в секунду
-                uiHandler.postDelayed(this, 333L)
+                uiHandler.postDelayed(this, PROGRESS_UPDATE_INTERVAL_MS)
             }
         }
     }
@@ -47,7 +50,6 @@ class PlayerActivity : AppCompatActivity() {
             onBackPressedDispatcher.onBackPressed()
         }
 
-        // получаем трек (Parcelable для всех API)
         track = intent.getParcelableExtraCompat(EXTRA_TRACK)
             ?: error("PlayerActivity: Track extra is missing")
 
@@ -63,7 +65,6 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    // ——— Жизненный цикл: пауза при уходе в фон ———
     override fun onStop() {
         super.onStop()
         if (state == State.PLAYING) pausePlayback()
@@ -75,7 +76,6 @@ class PlayerActivity : AppCompatActivity() {
         stopAndRelease()
     }
 
-    // ——— Подготовка плеера ———
     private fun preparePlayer(previewUrl: String?) {
         if (previewUrl.isNullOrBlank()) {
             binding.playBtn.isEnabled = false
@@ -95,19 +95,17 @@ class PlayerActivity : AppCompatActivity() {
                 binding.progressText.text = formatMs(0)
             }
             setOnCompletionListener {
-                // Закончили: сброс в исходное состояние
                 state = State.PREPARED
                 setPlayIcon()
                 stopTimer()
                 binding.progressText.text = formatMs(0)
-                seekTo(0) // на начало
+                seekTo(0)
             }
             prepareAsync()
         }
         binding.playBtn.isEnabled = false
     }
 
-    // ——— Управление воспроизведением ———
     private fun startPlayback() {
         mediaPlayer?.start()
         state = State.PLAYING
@@ -132,7 +130,6 @@ class PlayerActivity : AppCompatActivity() {
         state = State.DEFAULT
     }
 
-    // ——— Таймер прогресса ———
     private fun startTimer() {
         uiHandler.removeCallbacks(progressRunnable)
         uiHandler.post(progressRunnable)
@@ -142,7 +139,6 @@ class PlayerActivity : AppCompatActivity() {
         uiHandler.removeCallbacks(progressRunnable)
     }
 
-    // ——— Привязка данных к UI ———
     private fun bindTrack(t: Track) = with(binding) {
         titleText.text = t.trackName
         artistText.text = t.artistName
@@ -178,10 +174,9 @@ class PlayerActivity : AppCompatActivity() {
             countryValue.text = t.country
         }
 
-        // обложка
         val radius = resources.getDimensionPixelSize(R.dimen.track_cover_radius)
         Glide.with(this@PlayerActivity)
-            .load(t.getCoverArtwork())
+            .load(t.cover512())
             .placeholder(R.drawable.img_placeholder)
             .error(R.drawable.img_placeholder)
             .transform(RoundedCorners(radius))
@@ -189,21 +184,23 @@ class PlayerActivity : AppCompatActivity() {
 
         progressText.text = formatMs(0)
         setPlayIcon()
-        playBtn.isEnabled = false // включится после prepare()
+        playBtn.isEnabled = false
     }
 
-    // ——— Вспомогательные ———
     private fun setPlayIcon() { binding.playBtn.setImageResource(R.drawable.ic_play_32) }
     private fun setPauseIcon() { binding.playBtn.setImageResource(R.drawable.ic_pause_32) }
 
     private fun formatMs(ms: Int): String =
         SimpleDateFormat("mm:ss", Locale.getDefault())
             .apply { timeZone = TimeZone.getTimeZone("UTC") }
-            .format(ms)
+            .format(ms.toLong())
 
     private fun Intent.getParcelableExtraCompat(key: String): Track? =
         if (Build.VERSION.SDK_INT >= 33) getParcelableExtra(key, Track::class.java)
         else @Suppress("DEPRECATION") getParcelableExtra(key)
 
-    companion object { const val EXTRA_TRACK = "extra_track" }
+    companion object {
+        const val EXTRA_TRACK = "extra_track"
+        private const val PROGRESS_UPDATE_INTERVAL_MS = 333L
+    }
 }

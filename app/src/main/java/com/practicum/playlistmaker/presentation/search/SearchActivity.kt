@@ -1,52 +1,44 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.presentation.search
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.view.View
 import android.view.WindowManager
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.MaterialToolbar
-import com.practicum.playlistmaker.Instance.NetworkClient
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.app.Creator
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
-import com.practicum.playlistmaker.dto.toDomain
-import com.practicum.playlistmaker.model.PlaylistApiResponse
-import com.practicum.playlistmaker.model.Track
-import com.practicum.playlistmaker.ui.TracksAdapter
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.practicum.playlistmaker.domain.entity.Track
+import com.practicum.playlistmaker.presentation.player.PlayerActivity
+import com.practicum.playlistmaker.presentation.search.TracksAdapter
 
 class SearchActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySearchBinding
     private lateinit var tracksAdapter: TracksAdapter
     private lateinit var historyAdapter: TracksAdapter
-    private lateinit var history: SearchHistory
+
+    private val interactor by lazy { Creator.searchInteractor(this) }
+
     private var searchText: String? = null
     private var lastSearchQuery: String? = null
-    private var runningCall: Call<PlaylistApiResponse>? = null
-
-
 
     private val searchHandler = Handler(Looper.getMainLooper())
     private var searchRunnable: Runnable? = null
-    private val SEARCH_DEBOUNCE_MS = 2000L
 
     private val clickHandler = Handler(Looper.getMainLooper())
     private var clickAllowed = true
-    private val CLICK_DEBOUNCE_MS = 1000L
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,23 +46,14 @@ class SearchActivity : AppCompatActivity() {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-
-
-        // Toolbar
-        val toolbar = binding.searchToolbar
+        val toolbar: MaterialToolbar = binding.searchToolbar
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
 
-        // История — ДОЛЖНА быть до первого использования!
-        history = SearchHistory(getSharedPreferences(SearchHistory.PREFS_NAME, MODE_PRIVATE))
-
-        // Восстановим текст
         savedInstanceState?.let { searchText = it.getString(KEY_SEARCH_TEXT) }
         binding.searchEditText.setText(searchText)
 
-        // Адаптеры
         tracksAdapter = TracksAdapter(mutableListOf()) { onTrackClickedSafe(it) }
         binding.tracksRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.tracksRecyclerView.adapter = tracksAdapter
@@ -79,33 +62,18 @@ class SearchActivity : AppCompatActivity() {
         binding.historyRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.historyRecyclerView.adapter = historyAdapter
 
-        // Листенеры (по одному разу)
         binding.searchEditText.addTextChangedListener(textWatcher)
         binding.searchEditText.setOnFocusChangeListener { _, _ -> updateHistoryVisibility() }
 
-
-        // Твой крестик-иконка очистки (если используешь отдельную кнопку)
         binding.clearButton.setOnClickListener {
-            // 1) чистим текст
             binding.searchEditText.text?.clear()
-            // 2) оставляем/возвращаем фокус в поле
             binding.searchEditText.requestFocus()
-            // 3) прячем результаты и показываем историю
-            clearSearchResultViews()
-            // 4) клавиатуру НЕ скрываем — по дизайну поле активно
-            updateHistoryVisibility()
-        }
-
-        binding.clearButton.setOnClickListener {
-            binding.searchEditText.text?.clear()
-            binding.searchEditText.clearFocus()
-            hideKeyboard()
             clearSearchResultViews()
             updateHistoryVisibility()
         }
 
         binding.clearHistoryButton.setOnClickListener {
-            history.clear()
+            interactor.clearHistory()
             updateHistoryVisibility()
         }
 
@@ -122,19 +90,9 @@ class SearchActivity : AppCompatActivity() {
 
         binding.retryButton.setOnClickListener { lastSearchQuery?.let { performSearch(it) } }
 
-        // Показать историю сразу при входе (без всплытия клавиатуры)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
-        if (binding.searchEditText.text.isNullOrEmpty() && history.notEmpty()) {
-            binding.searchEditText.requestFocus()
-            binding.searchEditText.post { updateHistoryVisibility() }
-        } else {
-            updateHistoryVisibility()
-        }
-
-
-
+        updateHistoryVisibility()
     }
-
 
     private val textWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -143,15 +101,12 @@ class SearchActivity : AppCompatActivity() {
             binding.clearButton.isVisible = !s.isNullOrEmpty()
             updateHistoryVisibility()
 
-
-            // дебаунсим запрос
             searchRunnable?.let { searchHandler.removeCallbacks(it) }
             val query = s?.toString()?.trim().orEmpty()
             if (query.isNotEmpty()) {
                 searchRunnable = Runnable { performSearch(query) }
                 searchHandler.postDelayed(searchRunnable!!, SEARCH_DEBOUNCE_MS)
             } else {
-                // пусто — убираем список, прячем прогресс
                 clearSearchResultViews()
                 binding.progressBar.visibility = View.GONE
             }
@@ -160,33 +115,28 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun onTrackClicked(track: Track) {
-        history.add(track)                     // <— сохранить/поднять в историю
+        interactor.pushToHistory(track)
         Toast.makeText(this, "${track.trackName} — ${track.artistName}", Toast.LENGTH_SHORT).show()
         val intent = Intent(this, PlayerActivity::class.java)
             .putExtra(PlayerActivity.EXTRA_TRACK, track)
         startActivity(intent)
     }
 
-
-    // Клик-debounce
     private fun onTrackClickedSafe(track: Track) {
         if (!clickAllowed) return
         clickAllowed = false
         clickHandler.postDelayed({ clickAllowed = true }, CLICK_DEBOUNCE_MS)
-
-        onTrackClicked(track) // ваш существующий метод (история + Toast + старт PlayerActivity)
+        onTrackClicked(track)
     }
-
 
     private fun updateHistoryVisibility() {
         val show = binding.searchEditText.hasFocus()
                 && binding.searchEditText.text.isNullOrEmpty()
-                && history.notEmpty()
+                && interactor.history().isNotEmpty()
 
         binding.historyGroup.isVisible = show
         if (show) {
-            historyAdapter.setData(history.get())
-            // Когда открыта история — прячем результаты/плейсхолдеры
+            historyAdapter.setData(interactor.history())
             binding.tracksRecyclerView.visibility = View.GONE
             binding.emptyPlaceholder.visibility = View.GONE
             binding.errorPlaceholder.visibility = View.GONE
@@ -194,22 +144,13 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun hideKeyboard() {
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(binding.searchEditText.windowToken, 0)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(KEY_SEARCH_TEXT, searchText)
-    }
-
-
-
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        searchText = savedInstanceState.getString(KEY_SEARCH_TEXT)
-        binding.searchEditText.setText(searchText)
     }
 
     override fun onDestroy() {
@@ -224,28 +165,14 @@ class SearchActivity : AppCompatActivity() {
         clearSearchResultViews()
         binding.progressBar.visibility = View.VISIBLE
 
-        runningCall?.cancel()
-        runningCall = NetworkClient.itunesApi.searchTracks(query).also { call ->
-            call.enqueue(object : Callback<PlaylistApiResponse> {
-                override fun onResponse(
-                    c: Call<PlaylistApiResponse>,
-                    response: Response<PlaylistApiResponse>
-                ) {
-                    binding.progressBar.visibility = View.GONE
-                    if (!isFinishing && !isDestroyed) {
-                        if (response.isSuccessful && response.body() != null) {
-                            val tracks = response.body()!!.results?.mapNotNull { it.toDomain() }.orEmpty()
-                            if (tracks.isEmpty()) showEmptyPlaceholder() else showTracks(tracks)
-                        } else showErrorPlaceholder()
-                    }
-                }
-
-                override fun onFailure(c: Call<PlaylistApiResponse>, t: Throwable) {
-                    binding.progressBar.visibility = View.GONE
-                    if (c.isCanceled) return
-                    if (!isFinishing && !isDestroyed) showErrorPlaceholder()
-                }
-            })
+        interactor.search(query) { result ->
+            if (isFinishing || isDestroyed) return@search
+            binding.progressBar.visibility = View.GONE
+            result.onSuccess { tracks ->
+                if (tracks.isEmpty()) showEmptyPlaceholder() else showTracks(tracks)
+            }.onFailure {
+                showErrorPlaceholder()
+            }
         }
     }
 
@@ -278,8 +205,9 @@ class SearchActivity : AppCompatActivity() {
 
     companion object {
         private const val KEY_SEARCH_TEXT = "KEY_SEARCH_TEXT"
+        private const val SEARCH_DEBOUNCE_MS = 2_000L
+        private const val CLICK_DEBOUNCE_MS = 1_000L
     }
-
 
     override fun onResume() {
         super.onResume()
