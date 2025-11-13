@@ -8,7 +8,7 @@
     android:orientation="vertical"
     style="@style/MainBackgroundColor"
     android:padding="@dimen/screen_padding"
-    tools:context=".MainActivity">
+    tools:context=".presentation.main.MainActivity">
 
     <!-- Заголовок -->
     <com.google.android.material.appbar.MaterialToolbar
