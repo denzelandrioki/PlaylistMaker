@@ -1,25 +1,13 @@
 package com.practicum.playlistmaker.presentation.player
 
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.domain.entity.PlayerState
+import com.practicum.playlistmaker.domain.entity.Track
 import com.practicum.playlistmaker.domain.interactor.PlayerInteractor
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.TimeZone
-
-private const val TICK_MS = 333L
-
-data class PlayerUiState(
-    val state: PlayerState = PlayerState.IDLE,
-    val positionText: String = "00:00"
-)
 
 class PlayerViewModel(
     private val interactor: PlayerInteractor
@@ -28,55 +16,70 @@ class PlayerViewModel(
     private val _ui = MutableLiveData(PlayerUiState())
     val ui: LiveData<PlayerUiState> = _ui
 
-    private var ticker: Job? = null
+    private val handler = Handler(Looper.getMainLooper())
+    private var ticker: Runnable? = null
 
-    fun prepare(url: String) {
+    companion object {
+        private const val TICK_MS = 333L
+    }
+
+    fun init(track: Track) {
+        // положим трек в стейт
+        _ui.value = _ui.value?.copy(track = track, state = PlayerState.IDLE, progressMs = 0)
+        // подготовим плеер
         interactor.prepare(
-            url = url,
-            onPrepared = { _ui.postValue(PlayerUiState(PlayerState.PREPARED, "00:00")) },
-            onComplete = { onCompletion() },
-            onError = { _ui.postValue(PlayerUiState(PlayerState.ERROR, "00:00")) }
+            url = track.previewUrl.orEmpty(),
+            onPrepared = {
+                _ui.postValue(_ui.value?.copy(state = PlayerState.PREPARED, canPlay = true, canPause = false))
+            },
+            onComplete = {
+                stopTicker()
+                _ui.postValue(_ui.value?.copy(state = PlayerState.COMPLETED, progressMs = 0, canPlay = true, canPause = false))
+            },
+            onError = {
+                stopTicker()
+                _ui.postValue(_ui.value?.copy(state = PlayerState.ERROR, progressMs = 0, canPlay = true, canPause = false))
+            }
         )
     }
 
-    fun toggle() {
+    fun onPlayPauseClicked() {
         when (interactor.state()) {
             PlayerState.PLAYING -> pause()
-            PlayerState.PAUSED, PlayerState.PREPARED, PlayerState.COMPLETED, PlayerState.IDLE -> play()
-            PlayerState.ERROR -> { /* ignore */ }
+            PlayerState.PAUSED,
+            PlayerState.PREPARED,
+            PlayerState.COMPLETED,
+            PlayerState.IDLE,
+            PlayerState.ERROR -> play()
         }
     }
 
     private fun play() {
         interactor.play()
-        _ui.value = _ui.value?.copy(state = PlayerState.PLAYING)
+        _ui.value = _ui.value?.copy(state = PlayerState.PLAYING, canPlay = false, canPause = true)
         startTicker()
     }
 
     private fun pause() {
         interactor.pause()
-        _ui.value = _ui.value?.copy(state = PlayerState.PAUSED)
+        _ui.value = _ui.value?.copy(state = PlayerState.PAUSED, canPlay = true, canPause = false)
         stopTicker()
-    }
-
-    private fun onCompletion() {
-        stopTicker()
-        _ui.postValue(PlayerUiState(PlayerState.COMPLETED, "00:00"))
     }
 
     private fun startTicker() {
         stopTicker()
-        ticker = viewModelScope.launch {
-            while (isActive && interactor.state() == PlayerState.PLAYING) {
-                val ms = interactor.currentPositionMs()
-                _ui.postValue(PlayerUiState(PlayerState.PLAYING, formatMs(ms)))
-                delay(TICK_MS)
+        ticker = object : Runnable {
+            override fun run() {
+                if (interactor.state() == PlayerState.PLAYING) {
+                    _ui.postValue(_ui.value?.copy(progressMs = interactor.currentPositionMs()))
+                    handler.postDelayed(this, TICK_MS)
+                }
             }
-        }
+        }.also { handler.post(it) }
     }
 
     private fun stopTicker() {
-        ticker?.cancel()
+        ticker?.let { handler.removeCallbacks(it) }
         ticker = null
     }
 
@@ -85,9 +88,4 @@ class PlayerViewModel(
         interactor.stop()
         super.onCleared()
     }
-
-    private fun formatMs(ms: Int): String =
-        SimpleDateFormat("mm:ss", Locale.getDefault()).apply {
-            timeZone = TimeZone.getTimeZone("UTC")
-        }.format(ms)
 }

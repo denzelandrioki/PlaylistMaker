@@ -189,6 +189,7 @@
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:paddingStart="@dimen/screen_padding"
+        android:paddingEnd="@dimen/screen_padding"
         android:layout_marginTop="@dimen/search_list_gap"
         app:layout_constraintTop_toBottomOf="@id/searchContainer"
         app:layout_constraintBottom_toBottomOf="parent"
