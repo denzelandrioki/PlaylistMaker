@@ -9,7 +9,7 @@ fun Track.durationMmSs(): String {
     val sdf = SimpleDateFormat("mm:ss", Locale.getDefault()).apply {
         timeZone = TimeZone.getTimeZone("UTC")
     }
-    return sdf.format((trackTimeMillis ?: 0L))
+    return sdf.format(trackTimeMillis) // теперь Long не null
 }
 
 fun Track.releaseYear(): String? =

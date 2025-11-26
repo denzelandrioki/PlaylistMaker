@@ -6,17 +6,18 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.app.App
-import com.practicum.playlistmaker.app.Creator
+import com.practicum.playlistmaker.creator.Creator
 
 class SettingsActivity : AppCompatActivity() {
 
-    private val settings by lazy { Creator.settingsInteractor(this) }
+    private val vm: SettingsViewModel by viewModels { Creator.provideSettingsViewModelFactory(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,47 +29,40 @@ class SettingsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
 
-        val darkThemeSwitch = findViewById<SwitchMaterial>(R.id.darkThemeSwitch)
+        val darkSwitch = findViewById<SwitchMaterial>(R.id.darkThemeSwitch)
 
-        // читаем состояние темы из домена
-        val isDark = settings.isDarkTheme()
-        darkThemeSwitch.isChecked = isDark
-
-        // применяем тему через App + сохраняем через интерактор
-        val app = applicationContext as App
-        darkThemeSwitch.setOnCheckedChangeListener { _, checked ->
-            settings.setDarkTheme(checked) // домен: сохранить выбор
-            app.switchTheme(checked)       // presentation: применить визуально
+        vm.dark.observe(this) { dark ->
+            // применяем тему в приложении
+            (application as App).switchTheme(dark)
+            if (darkSwitch.isChecked != dark) darkSwitch.isChecked = dark
         }
+        darkSwitch.setOnCheckedChangeListener { _, isChecked -> vm.toggle(isChecked) }
 
-        val shareButton = findViewById<MaterialTextView>(R.id.share_app_button)
-        val supportButton = findViewById<MaterialTextView>(R.id.support_button)
-        val userAgreementButton = findViewById<MaterialTextView>(R.id.user_agreement_button)
-
-        shareButton.setOnClickListener {
-            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+        // share
+        findViewById<MaterialTextView>(R.id.share_app_button).setOnClickListener {
+            val intent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, getString(R.string.share_message))
             }
-            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_app)))
+            startActivity(Intent.createChooser(intent, getString(R.string.share_app)))
         }
 
-        supportButton.setOnClickListener {
+        // terms
+        findViewById<MaterialTextView>(R.id.user_agreement_button).setOnClickListener {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.user_agreement_url))))
+        }
+
+        // support
+        findViewById<MaterialTextView>(R.id.support_button).setOnClickListener {
             val email = getString(R.string.support_email)
             val subject = getString(R.string.support_email_subject)
             val body = getString(R.string.support_email_body)
             val mailto = "mailto:$email?subject=${Uri.encode(subject)}&body=${Uri.encode(body)}"
             val emailIntent = Intent(Intent.ACTION_SENDTO, Uri.parse(mailto))
-            try {
-                startActivity(emailIntent)
-            } catch (_: ActivityNotFoundException) {
+            try { startActivity(emailIntent) }
+            catch (_: ActivityNotFoundException) {
                 Toast.makeText(this, "Почтовый клиент не найден", Toast.LENGTH_SHORT).show()
             }
-        }
-
-        userAgreementButton.setOnClickListener {
-            val url = getString(R.string.user_agreement_url)
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         }
     }
 }
