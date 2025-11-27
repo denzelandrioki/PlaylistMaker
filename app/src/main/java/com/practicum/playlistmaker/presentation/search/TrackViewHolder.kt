@@ -22,7 +22,7 @@ class TrackViewHolder private constructor(itemView: View) :
     fun bind(track: Track) {
         trackName.text = track.trackName
 
-        val seconds = (track.trackTimeMillis ?: 0L) / 1000L
+        val seconds = track.trackTimeMillis / 1000L
         val mmss = DateUtils.formatElapsedTime(seconds)
         subtitle.text = "${track.artistName} · $mmss"
 

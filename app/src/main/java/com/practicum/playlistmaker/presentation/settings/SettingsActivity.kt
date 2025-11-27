@@ -30,15 +30,12 @@ class SettingsActivity : AppCompatActivity() {
 
         val darkThemeSwitch = findViewById<SwitchMaterial>(R.id.darkThemeSwitch)
 
-        // читаем состояние темы из домена
+        val app = applicationContext as App
         val isDark = settings.isDarkTheme()
         darkThemeSwitch.isChecked = isDark
-
-        // применяем тему через App + сохраняем через интерактор
-        val app = applicationContext as App
         darkThemeSwitch.setOnCheckedChangeListener { _, checked ->
-            settings.setDarkTheme(checked) // домен: сохранить выбор
-            app.switchTheme(checked)       // presentation: применить визуально
+            settings.setDarkTheme(checked) // сохраняем через domain->data
+            app.applyTheme(checked)        // применяем визуально
         }
 
         val shareButton = findViewById<MaterialTextView>(R.id.share_app_button)
@@ -59,9 +56,8 @@ class SettingsActivity : AppCompatActivity() {
             val body = getString(R.string.support_email_body)
             val mailto = "mailto:$email?subject=${Uri.encode(subject)}&body=${Uri.encode(body)}"
             val emailIntent = Intent(Intent.ACTION_SENDTO, Uri.parse(mailto))
-            try {
-                startActivity(emailIntent)
-            } catch (_: ActivityNotFoundException) {
+            try { startActivity(emailIntent) }
+            catch (_: ActivityNotFoundException) {
                 Toast.makeText(this, "Почтовый клиент не найден", Toast.LENGTH_SHORT).show()
             }
         }
