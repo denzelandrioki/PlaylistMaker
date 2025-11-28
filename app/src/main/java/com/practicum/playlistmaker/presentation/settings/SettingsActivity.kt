@@ -11,12 +11,11 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.app.App
-import com.practicum.playlistmaker.app.Creator
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity() {
 
-    private val settings by lazy { Creator.settingsInteractor(this) }
+    private val viewModel: SettingsViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,14 +28,8 @@ class SettingsActivity : AppCompatActivity() {
         toolbar.setNavigationOnClickListener { finish() }
 
         val darkThemeSwitch = findViewById<SwitchMaterial>(R.id.darkThemeSwitch)
-
-        val app = applicationContext as App
-        val isDark = settings.isDarkTheme()
-        darkThemeSwitch.isChecked = isDark
-        darkThemeSwitch.setOnCheckedChangeListener { _, checked ->
-            settings.setDarkTheme(checked) // сохраняем через domain->data
-            app.applyTheme(checked)        // применяем визуально
-        }
+        viewModel.darkTheme.observe(this) { dark -> darkThemeSwitch.isChecked = dark }
+        darkThemeSwitch.setOnCheckedChangeListener { _, checked -> viewModel.setDarkTheme(checked) }
 
         val shareButton = findViewById<MaterialTextView>(R.id.share_app_button)
         val supportButton = findViewById<MaterialTextView>(R.id.support_button)
@@ -51,20 +44,18 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         supportButton.setOnClickListener {
-            val email = getString(R.string.support_email)
-            val subject = getString(R.string.support_email_subject)
-            val body = getString(R.string.support_email_body)
-            val mailto = "mailto:$email?subject=${Uri.encode(subject)}&body=${Uri.encode(body)}"
-            val emailIntent = Intent(Intent.ACTION_SENDTO, Uri.parse(mailto))
-            try { startActivity(emailIntent) }
-            catch (_: ActivityNotFoundException) {
+            val mailto = "mailto:${getString(R.string.support_email)}" +
+                    "?subject=${Uri.encode(getString(R.string.support_email_subject))}" +
+                    "&body=${Uri.encode(getString(R.string.support_email_body))}"
+            try {
+                startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse(mailto)))
+            } catch (_: ActivityNotFoundException) {
                 Toast.makeText(this, "Почтовый клиент не найден", Toast.LENGTH_SHORT).show()
             }
         }
 
         userAgreementButton.setOnClickListener {
-            val url = getString(R.string.user_agreement_url)
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.user_agreement_url))))
         }
     }
 }
