@@ -1,91 +1,79 @@
 package com.practicum.playlistmaker.presentation.player
 
-import android.os.Handler
-import android.os.Looper
+import android.os.CountDownTimer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.practicum.playlistmaker.domain.entity.PlayerState
-import com.practicum.playlistmaker.domain.entity.Track
 import com.practicum.playlistmaker.domain.interactor.PlayerInteractor
 
+private const val TICK_MS = 333L
+
+
+
 class PlayerViewModel(
-    private val interactor: PlayerInteractor
+    private val player: PlayerInteractor
 ) : ViewModel() {
 
     private val _ui = MutableLiveData(PlayerUiState())
     val ui: LiveData<PlayerUiState> = _ui
 
-    private val handler = Handler(Looper.getMainLooper())
-    private var ticker: Runnable? = null
+    private var timer: CountDownTimer? = null
 
-    companion object {
-        private const val TICK_MS = 333L
-    }
-
-    fun init(track: Track) {
-        // положим трек в стейт
-        _ui.value = _ui.value?.copy(track = track, state = PlayerState.IDLE, progressMs = 0)
-        // подготовим плеер
-        interactor.prepare(
-            url = track.previewUrl.orEmpty(),
-            onPrepared = {
-                _ui.postValue(_ui.value?.copy(state = PlayerState.PREPARED, canPlay = true, canPause = false))
-            },
-            onComplete = {
-                stopTicker()
-                _ui.postValue(_ui.value?.copy(state = PlayerState.COMPLETED, progressMs = 0, canPlay = true, canPause = false))
-            },
-            onError = {
-                stopTicker()
-                _ui.postValue(_ui.value?.copy(state = PlayerState.ERROR, progressMs = 0, canPlay = true, canPause = false))
-            }
+    fun prepare(url: String) {
+        player.prepare(
+            url = url,
+            onPrepared = { _ui.postValue(_ui.value!!.copy(state = PlayerState.PREPARED, progressMs = 0)) },
+            onComplete = { onCompletion() },
+            onError = { onCompletion() }
         )
     }
 
-    fun onPlayPauseClicked() {
-        when (interactor.state()) {
+    fun playPause() {
+        when (player.state()) {
             PlayerState.PLAYING -> pause()
-            PlayerState.PAUSED,
-            PlayerState.PREPARED,
-            PlayerState.COMPLETED,
-            PlayerState.IDLE,
-            PlayerState.ERROR -> play()
+            PlayerState.PAUSED, PlayerState.PREPARED, PlayerState.COMPLETED,
+            PlayerState.IDLE, PlayerState.ERROR -> play()
         }
     }
 
     private fun play() {
-        interactor.play()
-        _ui.value = _ui.value?.copy(state = PlayerState.PLAYING, canPlay = false, canPause = true)
+        player.play()
+        _ui.postValue(_ui.value!!.copy(state = PlayerState.PLAYING, canPlay = false, canPause = true))
         startTicker()
     }
 
     private fun pause() {
-        interactor.pause()
-        _ui.value = _ui.value?.copy(state = PlayerState.PAUSED, canPlay = true, canPause = false)
+        player.pause()
+        _ui.postValue(_ui.value!!.copy(state = PlayerState.PAUSED, canPlay = true, canPause = false))
         stopTicker()
+    }
+
+    private fun onCompletion() {
+        stopTicker()
+        _ui.postValue(PlayerUiState(state = PlayerState.COMPLETED, progressMs = 0))
     }
 
     private fun startTicker() {
         stopTicker()
-        ticker = object : Runnable {
-            override fun run() {
-                if (interactor.state() == PlayerState.PLAYING) {
-                    _ui.postValue(_ui.value?.copy(progressMs = interactor.currentPositionMs()))
-                    handler.postDelayed(this, TICK_MS)
+        timer = object : CountDownTimer(Long.MAX_VALUE, TICK_MS) {
+            override fun onTick(millisUntilFinished: Long) {
+                if (player.state() == PlayerState.PLAYING) {
+                    _ui.postValue(_ui.value!!.copy(progressMs = player.currentPositionMs()))
                 }
             }
-        }.also { handler.post(it) }
+            override fun onFinish() {}
+        }.start()
     }
 
     private fun stopTicker() {
-        ticker?.let { handler.removeCallbacks(it) }
-        ticker = null
+        timer?.cancel()
+        timer = null
     }
 
     override fun onCleared() {
         stopTicker()
-        interactor.stop()
+        player.stop()
         super.onCleared()
     }
 }

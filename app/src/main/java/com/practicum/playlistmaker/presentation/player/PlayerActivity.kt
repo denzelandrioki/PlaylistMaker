@@ -8,9 +8,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.app.Creator
 import com.practicum.playlistmaker.databinding.ActivityPlayerBinding
+import com.practicum.playlistmaker.domain.entity.PlayerState
 import com.practicum.playlistmaker.domain.entity.Track
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
@@ -18,7 +19,8 @@ import java.util.TimeZone
 class PlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPlayerBinding
-    private val viewModel by viewModels<PlayerViewModel> { Creator.providePlayerViewModelFactory() }
+    private val viewModel: PlayerViewModel by viewModel()
+    private lateinit var track: Track
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,69 +31,63 @@ class PlayerActivity : AppCompatActivity() {
             onBackPressedDispatcher.onBackPressed()
         }
 
-        val track: Track = intent.getParcelableExtraCompat(EXTRA_TRACK)
-            ?: error("Track extra is missing")
+        track = intent.getParcelableExtraCompat(EXTRA_TRACK) ?: error("Track extra is missing")
 
-        bindStatic(track)
-        viewModel.init(track)
+        bindTrack(track)
+        viewModel.prepare(track.previewUrl.orEmpty())
 
-        // click
-        binding.playBtn.setOnClickListener { viewModel.onPlayPauseClicked() }
+        binding.playBtn.setOnClickListener { viewModel.playPause() }
 
-        // observe UI state
-        viewModel.ui.observe(this) { state ->
-            // кнопка
-            binding.playBtn.isEnabled = state.canPlay || state.canPause
+        viewModel.ui.observe(this) { ui ->
+            binding.progressText.text = formatMs(ui.progressMs)
             binding.playBtn.setImageResource(
-                if (state.canPause) R.drawable.ic_pause_32 else R.drawable.ic_play_32
+                if (ui.state == PlayerState.PLAYING) R.drawable.ic_pause_32
+                else R.drawable.ic_play_32
             )
-            // прогресс
-            binding.progressText.text = formatMs(state.progressMs)
+            if (ui.state == PlayerState.COMPLETED) binding.progressText.text = "00:00"
         }
     }
 
-    private fun bindStatic(track: Track) = with(binding) {
+    private fun bindTrack(track: Track) = with(binding) {
         titleText.text = track.trackName
         artistText.text = track.artistName
         durationValue.text = formatMs((track.trackTimeMillis ?: 0L).toInt())
 
-        // Альбом
-        if (track.collectionName.isNullOrBlank()) {
-            albumLabel.gone(); albumValue.gone()
-        } else {
-            albumValue.text = track.collectionName
-            albumLabel.visible(); albumValue.visible()
-        }
-
-        // Год
         val year = track.releaseDate?.takeIf { it.length >= 4 }?.substring(0, 4)
-        if (year.isNullOrBlank()) {
-            yearLabel.gone(); yearValue.gone()
+        yearLabel.visibility = if (year.isNullOrBlank()) android.view.View.GONE else android.view.View.VISIBLE
+        yearValue.visibility = yearLabel.visibility
+        yearValue.text = year
+
+        if (track.collectionName.isNullOrBlank()) {
+            albumLabel.visibility = android.view.View.GONE
+            albumValue.visibility = android.view.View.GONE
         } else {
-            yearValue.text = year
-            yearLabel.visible(); yearValue.visible()
+            albumLabel.visibility = android.view.View.VISIBLE
+            albumValue.visibility = android.view.View.VISIBLE
+            albumValue.text = track.collectionName
         }
 
-        // Жанр
         if (track.primaryGenreName.isNullOrBlank()) {
-            genreLabel.gone(); genreValue.gone()
+            genreLabel.visibility = android.view.View.GONE
+            genreValue.visibility = android.view.View.GONE
         } else {
+            genreLabel.visibility = android.view.View.VISIBLE
+            genreValue.visibility = android.view.View.VISIBLE
             genreValue.text = track.primaryGenreName
-            genreLabel.visible(); genreValue.visible()
         }
 
-        // Страна
         if (track.country.isNullOrBlank()) {
-            countryLabel.gone(); countryValue.gone()
+            countryLabel.visibility = android.view.View.GONE
+            countryValue.visibility = android.view.View.GONE
         } else {
+            countryLabel.visibility = android.view.View.VISIBLE
+            countryValue.visibility = android.view.View.VISIBLE
             countryValue.text = track.country
-            countryLabel.visible(); countryValue.visible()
         }
 
-        // Обложка 512×512
         val radius = resources.getDimensionPixelSize(R.dimen.track_cover_radius)
         Glide.with(this@PlayerActivity)
-            .load(track.artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg"))
+            .load(track.cover512())
             .placeholder(R.drawable.img_placeholder)
             .error(R.drawable.img_placeholder)
             .transform(RoundedCorners(radius))
@@ -102,24 +98,17 @@ class PlayerActivity : AppCompatActivity() {
         progressText.text = "00:00"
     }
 
-    // helpers
     private fun formatMs(ms: Int): String =
         SimpleDateFormat("mm:ss", Locale.getDefault()).apply {
             timeZone = TimeZone.getTimeZone("UTC")
         }.format(ms)
 
-    // ↓ корректный импорт Build и использование константы API
+    @Suppress("DEPRECATION")
     private fun <T : android.os.Parcelable> Intent.getParcelableExtraCompat(key: String): T? =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            @Suppress("UNCHECKED_CAST")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
             getParcelableExtra(key, Track::class.java) as T?
-        } else {
-            @Suppress("DEPRECATION")
+        else
             getParcelableExtra(key)
-        }
-
-    private fun android.view.View.gone() { this.visibility = android.view.View.GONE }
-    private fun android.view.View.visible() { this.visibility = android.view.View.VISIBLE }
 
     companion object {
         const val EXTRA_TRACK = "extra_track"

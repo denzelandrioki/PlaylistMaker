@@ -3,14 +3,8 @@ package com.practicum.playlistmaker.presentation.search
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.domain.entity.Track
 import com.practicum.playlistmaker.domain.interactor.SearchInteractor
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-
-private const val SEARCH_DEBOUNCE_MS = 2_000L
 
 sealed interface SearchState {
     data object Idle : SearchState
@@ -28,28 +22,26 @@ class SearchViewModel(
     private val _state = MutableLiveData<SearchState>(SearchState.History(interactor.history()))
     val state: LiveData<SearchState> = _state
 
-    private var lastQuery: String = ""
-    private var debounceJob: Job? = null
+    private var lastQuery: String? = null
 
-    fun onQueryChanged(q: String) {
-        lastQuery = q
-        if (q.isBlank()) {
+    fun onQueryChanged(text: String) {
+        lastQuery = text
+        if (text.isBlank()) {
             _state.value = SearchState.History(interactor.history())
             return
         }
-        debounceJob?.cancel()
-        debounceJob = viewModelScope.launch {
-            delay(SEARCH_DEBOUNCE_MS)
-            performSearch(q)
+        _state.value = SearchState.Loading
+        interactor.search(text) { result ->
+            result.onSuccess { list ->
+                _state.postValue(if (list.isEmpty()) SearchState.Empty else SearchState.Content(list))
+            }.onFailure {
+                _state.postValue(SearchState.Error)
+            }
         }
     }
 
     fun onRetry() {
-        if (lastQuery.isNotBlank()) performSearch(lastQuery)
-    }
-
-    fun onClickTrack(track: Track) {
-        interactor.pushToHistory(track)
+        lastQuery?.let { onQueryChanged(it) }
     }
 
     fun onClearHistory() {
@@ -57,14 +49,7 @@ class SearchViewModel(
         _state.value = SearchState.History(emptyList())
     }
 
-    private fun performSearch(q: String) {
-        _state.value = SearchState.Loading
-        interactor.search(q) { result ->
-            result.onSuccess { list ->
-                _state.postValue(if (list.isEmpty()) SearchState.Empty else SearchState.Content(list))
-            }.onFailure {
-                _state.postValue(SearchState.Error)
-            }
-        }
+    fun onClickTrack(track: Track) {
+        interactor.pushToHistory(track)
     }
 }
