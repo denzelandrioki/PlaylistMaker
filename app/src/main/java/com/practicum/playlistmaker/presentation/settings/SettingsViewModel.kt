@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.practicum.playlistmaker.domain.interactor.SettingsInteractor
+
 class SettingsViewModel(
     private val settings: SettingsInteractor
 ) : ViewModel() {

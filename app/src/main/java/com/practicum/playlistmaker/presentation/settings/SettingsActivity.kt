@@ -44,11 +44,14 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         supportButton.setOnClickListener {
-            val mailto = "mailto:${getString(R.string.support_email)}" +
-                    "?subject=${Uri.encode(getString(R.string.support_email_subject))}" +
-                    "&body=${Uri.encode(getString(R.string.support_email_body))}"
+            val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse("mailto:")
+                putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_email)))
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_email_subject))
+                putExtra(Intent.EXTRA_TEXT, getString(R.string.support_email_body))
+            }
             try {
-                startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse(mailto)))
+                startActivity(Intent.createChooser(emailIntent, getString(R.string.support)))
             } catch (_: ActivityNotFoundException) {
                 Toast.makeText(this, "Почтовый клиент не найден", Toast.LENGTH_SHORT).show()
             }
