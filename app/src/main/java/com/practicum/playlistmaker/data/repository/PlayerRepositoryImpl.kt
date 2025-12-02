@@ -5,7 +5,9 @@ import android.media.MediaPlayer
 import com.practicum.playlistmaker.domain.entity.PlayerState
 import com.practicum.playlistmaker.domain.repository.PlayerRepository
 
-class PlayerRepositoryImpl : PlayerRepository {
+class PlayerRepositoryImpl(
+    private val mediaPlayerFactory: () -> MediaPlayer
+) : PlayerRepository {
 
     private var mp: MediaPlayer? = null
     private var state: PlayerState = PlayerState.IDLE
@@ -21,7 +23,7 @@ class PlayerRepositoryImpl : PlayerRepository {
             onError(IllegalArgumentException("previewUrl is null"))
             return
         }
-        mp = MediaPlayer().apply {
+        mp = mediaPlayerFactory().apply {
             try {
                 setDataSource(url)
                 setOnPreparedListener {

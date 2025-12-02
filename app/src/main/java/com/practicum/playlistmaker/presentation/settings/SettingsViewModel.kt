@@ -1,5 +1,7 @@
 package com.practicum.playlistmaker.presentation.settings
 
+
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,12 +11,18 @@ class SettingsViewModel(
     private val settings: SettingsInteractor
 ) : ViewModel() {
 
-    private val _dark = MutableLiveData<Boolean>(settings.isDarkTheme())
-    val dark: LiveData<Boolean> = _dark
+    private val _darkTheme = MutableLiveData(settings.isDarkTheme())
+    val darkTheme: LiveData<Boolean> = _darkTheme
 
-    fun toggle(value: Boolean) {
-        if (_dark.value == value) return
-        _dark.value = value
-        settings.setDarkTheme(value)
+    fun setDarkTheme(enabled: Boolean) {
+        if (_darkTheme.value == enabled) return
+        settings.setDarkTheme(enabled)
+        _darkTheme.value = enabled
+
+        // применяем сразу (UI-эффект в ответ на состояние VM)
+        AppCompatDelegate.setDefaultNightMode(
+            if (enabled) AppCompatDelegate.MODE_NIGHT_YES
+            else AppCompatDelegate.MODE_NIGHT_NO
+        )
     }
 }
