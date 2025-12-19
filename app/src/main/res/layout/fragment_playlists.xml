@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    tools:context=".presentation.media.PlaylistsFragment">
+
+    <!-- Кнопка "Новый плейлист" -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/newPlaylistButton"
+        style="@style/NewPlaylistButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/new_playlist"
+        app:backgroundTint="@color/new_playlist_btn_bg"
+        android:textColor="@color/new_playlist_btn_text"
+        app:cornerRadius="24dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp" />
+
+    <!-- Пустое состояние: иконка и текст -->
+    <ImageView
+        android:id="@+id/emptyIcon"
+        style="@style/IconEmptyMedia"
+        android:contentDescription="@string/no_playlists_message"
+        android:layout_marginTop="@dimen/playlist_button_to_empty_gap"
+        android:layout_marginStart="@dimen/empty_state_icon_margin"
+        android:layout_marginEnd="@dimen/empty_state_icon_margin"
+        app:layout_constraintTop_toBottomOf="@id/newPlaylistButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        style="@style/TextEmptyState"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/empty_state_icon_text_gap"
+        android:layout_marginStart="@dimen/empty_state_text_margin"
+        android:layout_marginEnd="@dimen/empty_state_text_margin"
+        android:text="@string/no_playlists_message"
+        app:layout_constraintTop_toBottomOf="@id/emptyIcon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
