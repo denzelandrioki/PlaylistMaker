@@ -14,6 +14,9 @@
     <color name="history_btn_bg">#FFFFFF</color>
     <color name="history_btn_text">#1A1B22</color>
 
+    <color name="new_playlist_btn_bg">#FFFFFF</color>
+    <color name="new_playlist_btn_text">#1A1B22</color>
+
     <!-- Дополнительные цвета для ночной темы -->
 
     <color name="searchField_light">#E7EAF2</color>

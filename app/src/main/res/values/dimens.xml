@@ -33,4 +33,11 @@
     <dimen name="buttom_layout_width">0dp</dimen>
     <dimen name="setting_bar_image_size">24dp</dimen>
 
+    <!-- Медиатека - отступы для пустых состояний -->
+    <dimen name="empty_state_top_margin">106dp</dimen>
+    <dimen name="empty_state_icon_margin">120dp</dimen>
+    <dimen name="empty_state_text_margin">24dp</dimen>
+    <dimen name="empty_state_icon_text_gap">16dp</dimen>
+    <dimen name="playlist_button_to_empty_gap">114dp</dimen>
+
 </resources>

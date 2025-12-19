@@ -19,6 +19,9 @@
     <color name="history_btn_bg">#1A1B22</color>
     <color name="history_btn_text">#FFFFFF</color>
 
+    <color name="new_playlist_btn_bg">#1A1B22</color>
+    <color name="new_playlist_btn_text">#FFFFFF</color>
+
 
     <!-- Дополнительные цвета для дневной темы -->
 

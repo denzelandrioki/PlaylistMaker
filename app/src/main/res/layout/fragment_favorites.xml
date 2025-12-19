@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    tools:context=".presentation.media.FavoritesFragment">
+
+    <!-- Пустое состояние: иконка и текст -->
+    <ImageView
+        android:id="@+id/emptyIcon"
+        style="@style/IconEmptyMedia"
+        android:contentDescription="@string/empty_media_library"
+        android:layout_marginTop="@dimen/empty_state_top_margin"
+        android:layout_marginStart="@dimen/empty_state_icon_margin"
+        android:layout_marginEnd="@dimen/empty_state_icon_margin"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        style="@style/TextEmptyFavor"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/empty_state_icon_text_gap"
+        android:layout_marginStart="@dimen/empty_state_text_margin"
+        android:layout_marginEnd="@dimen/empty_state_text_margin"
+        android:text="@string/empty_media_library"
+        app:layout_constraintTop_toBottomOf="@id/emptyIcon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
