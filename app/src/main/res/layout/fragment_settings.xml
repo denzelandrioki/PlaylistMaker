@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".presentation.settings.SettingsFragment"
+    android:fitsSystemWindows="true">
+
+    <!-- Toolbar без кнопки назад -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/settingsToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorSurface"
+        app:title="@string/settings"
+        app:titleTextAppearance="@style/TitleStyle"
+        android:fitsSystemWindows="true"/>
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:paddingStart="@dimen/screen_padding"
+        android:paddingEnd="@dimen/screen_padding"
+        style="@style/TextNoTitle"
+        android:id="@+id/darkThemeSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/menu_gap"
+        android:text="@string/dark_theme"
+        android:paddingVertical="20dp"
+        android:gravity="center_vertical"
+        app:thumbTint="@color/switch_thumb_color"
+        app:trackTint="@color/switch_track_color"
+        app:useMaterialThemeColors="false"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:paddingStart="@dimen/screen_padding"
+        android:paddingEnd="@dimen/screen_padding"
+        style="@style/TextNoTitle"
+        android:id="@+id/share_app_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/share_app"
+        android:drawableEnd="@drawable/ic_share"
+        android:drawablePadding="16dp"
+        android:paddingVertical="20dp" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:paddingStart="@dimen/screen_padding"
+        android:paddingEnd="@dimen/screen_padding"
+        style="@style/TextNoTitle"
+        android:id="@+id/support_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/support"
+        android:drawableEnd="@drawable/ic_support"
+        android:paddingVertical="20dp" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:paddingStart="@dimen/screen_padding"
+        android:paddingEnd="@dimen/screen_padding"
+        style="@style/TextNoTitle"
+        android:id="@+id/user_agreement_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/user_agreement"
+        android:drawableEnd="@drawable/ic_arrow_right"
+        android:paddingVertical="20dp" />
+</LinearLayout>

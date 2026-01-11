@@ -1,65 +1,39 @@
-<LinearLayout
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    style="@style/MainBackgroundColor"
-    android:padding="@dimen/screen_padding"
+    android:id="@+id/main"
+    android:background="?attr/colorSurface"
     tools:context=".presentation.main.MainActivity">
 
-    <!-- Заголовок -->
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/mainToolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+    <!-- NavHostFragment -->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- BottomNavigationView -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurface"
+        app:menu="@menu/bottom_navigation_menu"
+        app:itemIconTint="?attr/colorOnSurface"
+        app:itemTextColor="?attr/colorOnSurface"
+        app:labelVisibilityMode="labeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-        app:title="@string/app_name"
-        app:titleTextAppearance="@style/ToolbarTitleTextAppearance"
-        app:titleTextColor="@color/white" />
-
-
-        <!-- Кнопка "Поиск" -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/search"
-            style="@style/MainButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/button_height"
-            android:layout_marginBottom="@dimen/button_margin"
-
-            android:text="@string/search"
-            app:icon="@drawable/ic_search"
-            app:iconGravity="textStart"
-            app:iconPadding="@dimen/screen_padding" />
-
-
-        <!-- Кнопка "Медиатека" -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/media"
-            style="@style/MainButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/button_height"
-            android:layout_marginBottom="@dimen/button_margin"
-            android:text="@string/library"
-            app:icon="@drawable/ic_library"
-            app:iconGravity="textStart"
-            app:iconPadding="@dimen/screen_padding"/>
-
-
-        <!-- Кнопка "Настройки" -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/setting"
-            style="@style/MainButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/button_height"
-            android:layout_marginBottom="@dimen/button_margin"
-            android:text="@string/settings"
-            app:icon="@drawable/ic_settings"
-            app:iconGravity="textStart"
-            app:iconPadding="@dimen/screen_padding"/>
-
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
