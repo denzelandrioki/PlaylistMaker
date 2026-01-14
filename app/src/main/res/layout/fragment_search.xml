@@ -6,7 +6,6 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context=".presentation.search.SearchFragment">
 
     <!-- Toolbar без кнопки назад -->
@@ -69,45 +68,51 @@
     </FrameLayout>
 
     <!-- ==== HISTORY BLOCK (только список) ==== -->
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/historyGroup"
-        android:orientation="vertical"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:visibility="gone"
-        android:paddingStart="@dimen/tracks_list_padding"
-        android:paddingEnd="@dimen/tracks_list_padding"
         app:layout_constraintTop_toBottomOf="@id/searchContainer"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <TextView
-            android:id="@+id/historyTitle"
-            style="@style/TitleHistoryStyle"
-            android:text="@string/history_title"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/historyRecyclerView"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"
-            android:overScrollMode="never"
-            android:layout_marginBottom="8dp"
-            />
+            android:paddingStart="@dimen/tracks_list_padding"
+            android:paddingEnd="@dimen/tracks_list_padding">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/clearHistoryButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/clear_history"
-            android:layout_gravity="center"
-            style="@style/HistoryButtonStyle"
-            app:backgroundTint="@color/history_btn_bg"
-            android:textColor="@color/history_btn_text"
-            app:cornerRadius="24dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"/>
-    </LinearLayout>
+            <TextView
+                android:id="@+id/historyTitle"
+                style="@style/TitleHistoryStyle"
+                android:text="@string/history_title"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/historyRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
+                android:layout_marginBottom="8dp"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/clearHistoryButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/clear_history"
+                android:layout_gravity="center"
+                style="@style/HistoryButtonStyle"
+                app:backgroundTint="@color/history_btn_bg"
+                android:textColor="@color/history_btn_text"
+                app:cornerRadius="24dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"/>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
     <!-- Empty -->
     <LinearLayout

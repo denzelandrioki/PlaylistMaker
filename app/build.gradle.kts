@@ -7,7 +7,8 @@ plugins {
 
 android {
     namespace = "com.practicum.playlistmaker"
-    compileSdk = 35 // Обновлено до версии 35
+    compileSdk = 36
+    // Обновлено до версии 35
 
     defaultConfig {
         applicationId = "com.practicum.playlistmaker"
@@ -33,12 +34,13 @@ android {
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
+    buildToolsVersion = "35.0.0"
 }
 
 dependencies {

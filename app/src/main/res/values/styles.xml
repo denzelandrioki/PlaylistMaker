@@ -206,6 +206,14 @@
         <item name="android:textColor">@color/YP_Black</item>
     </style>
 
+    <style name="NavigationTextStyle">
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:textSize">@dimen/navigat_text_size</item>
+        <item name="android:textColor">@color/YP_Black</item>
+    </style>
+
+
     <!-- Иконка в кнопках нижней панели -->
     <style name="BottomNavIconStyle">
         <item name="android:layout_width">24dp</item>

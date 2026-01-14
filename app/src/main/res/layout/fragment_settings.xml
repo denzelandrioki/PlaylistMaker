@@ -6,8 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".presentation.settings.SettingsFragment"
-    android:fitsSystemWindows="true">
+    tools:context=".presentation.settings.SettingsFragment">
 
     <!-- Toolbar без кнопки назад -->
     <com.google.android.material.appbar.MaterialToolbar
@@ -16,8 +15,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorSurface"
         app:title="@string/settings"
-        app:titleTextAppearance="@style/TitleStyle"
-        android:fitsSystemWindows="true"/>
+        app:titleTextAppearance="@style/TitleStyle"/>
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:paddingStart="@dimen/screen_padding"

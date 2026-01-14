@@ -33,5 +33,12 @@ class MainActivity : AppCompatActivity() {
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigationView.setupWithNavController(navController)
+
+        // Скрываем BottomNavigationView на экране PlayerFragment
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            val isPlayerFragment = destination.id == R.id.playerFragment
+            binding.bottomNavigationView.visibility = if (isPlayerFragment) android.view.View.GONE else android.view.View.VISIBLE
+            binding.bottomNavDivider.visibility = if (isPlayerFragment) android.view.View.GONE else android.view.View.VISIBLE
+        }
     }
 }
