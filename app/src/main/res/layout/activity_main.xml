@@ -25,17 +25,19 @@
     <!-- BottomNavigationView -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
+        style="@style/BottomNavigationViewStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/bottom_nav_background"
         app:menu="@menu/bottom_navigation_menu"
-        app:itemIconTint="@color/bottom_nav_icon_color"
-        app:itemTextAppearance="@style/NavigationTextStyle"
-        app:itemTextColor="@color/bottom_nav_text_color"
         app:labelVisibilityMode="labeled"
+        app:itemIconTint="@color/bottom_nav_icon_color"
+        app:itemTextColor="@color/bottom_nav_text_color"
+        app:itemTextAppearance="@style/NavigationTextStyle"
+        app:itemRippleColor="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Разделитель сверху BottomNavigationView -->
     <View

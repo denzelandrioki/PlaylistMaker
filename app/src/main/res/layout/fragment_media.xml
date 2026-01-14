@@ -29,7 +29,7 @@
         android:background="?attr/colorSurface"
         app:tabTextColor="?attr/colorOnSurface"
         app:tabSelectedTextColor="?attr/colorOnSurface"
-        app:tabIndicatorColor="?attr/colorControlActivated"
+        app:tabIndicatorColor="@color/YP_Black"
         app:tabIndicatorFullWidth="true"
         app:tabMode="fixed"
         app:tabGravity="fill"

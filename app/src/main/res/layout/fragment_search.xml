@@ -83,7 +83,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingStart="@dimen/tracks_list_padding"
-            android:paddingEnd="@dimen/tracks_list_padding">
+            android:paddingEnd="@dimen/tracks_list_padding"
+            android:paddingBottom="@dimen/screen_padding">
 
             <TextView
                 android:id="@+id/historyTitle"

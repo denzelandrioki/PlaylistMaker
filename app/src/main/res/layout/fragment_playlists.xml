@@ -11,31 +11,43 @@
     <!-- Кнопка "Новый плейлист" -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/newPlaylistButton"
-        style="@style/NewPlaylistButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/new_playlist"
-        app:backgroundTint="@color/new_playlist_btn_bg"
-        android:textColor="@color/new_playlist_btn_text"
-        app:cornerRadius="24dp"
+        android:layout_width="133dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="24dp"
         android:insetTop="0dp"
         android:insetBottom="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
+        android:text="@string/new_playlist"
+        android:textColor="@color/new_playlist_btn_text"
+        android:textSize="14sp"
+        android:textFontWeight="500"
+        android:fontFamily="@font/ys_display_medium"
+        app:backgroundTint="@color/new_playlist_btn_bg"
+        app:cornerRadius="18dp"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Пустое состояние: иконка и текст -->
+
     <ImageView
         android:id="@+id/emptyIcon"
         style="@style/IconEmptyMedia"
-        android:contentDescription="@string/no_playlists_message"
-        android:layout_marginTop="@dimen/playlist_button_to_empty_gap"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:layout_marginStart="@dimen/empty_state_icon_margin"
+        android:layout_marginTop="44dp"
         android:layout_marginEnd="@dimen/empty_state_icon_margin"
-        app:layout_constraintTop_toBottomOf="@id/newPlaylistButton"
-        app:layout_constraintStart_toStartOf="parent"
+        android:contentDescription="@string/no_playlists_message"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.49"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/newPlaylistButton"
         tools:ignore="ContentDescription" />
 
     <TextView
