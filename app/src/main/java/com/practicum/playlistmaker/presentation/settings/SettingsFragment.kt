@@ -4,38 +4,44 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.appbar.MaterialToolbar
+import androidx.fragment.app.Fragment
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.databinding.FragmentSettingsBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsFragment : Fragment() {
 
+    private var _binding: FragmentSettingsBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: SettingsViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_settings)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        val toolbar = findViewById<MaterialToolbar>(R.id.settingsToolbar)
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setNavigationOnClickListener { finish() }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        val darkThemeSwitch = findViewById<SwitchMaterial>(R.id.darkThemeSwitch)
-        viewModel.darkTheme.observe(this) { dark -> darkThemeSwitch.isChecked = dark }
-        darkThemeSwitch.setOnCheckedChangeListener { _, checked -> viewModel.setDarkTheme(checked) }
+        val darkThemeSwitch = binding.darkThemeSwitch
+        viewModel.darkTheme.observe(viewLifecycleOwner) { dark -> 
+            darkThemeSwitch.isChecked = dark 
+        }
+        darkThemeSwitch.setOnCheckedChangeListener { _, checked -> 
+            viewModel.setDarkTheme(checked) 
+        }
 
-        val shareButton = findViewById<MaterialTextView>(R.id.share_app_button)
-        val supportButton = findViewById<MaterialTextView>(R.id.support_button)
-        val userAgreementButton = findViewById<MaterialTextView>(R.id.user_agreement_button)
-
-        shareButton.setOnClickListener {
+        binding.shareAppButton.setOnClickListener {
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, getString(R.string.share_message))
@@ -43,7 +49,7 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(Intent.createChooser(shareIntent, getString(R.string.share_app)))
         }
 
-        supportButton.setOnClickListener {
+        binding.supportButton.setOnClickListener {
             val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:")
                 putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_email)))
@@ -53,12 +59,17 @@ class SettingsActivity : AppCompatActivity() {
             try {
                 startActivity(Intent.createChooser(emailIntent, getString(R.string.support)))
             } catch (_: ActivityNotFoundException) {
-                Toast.makeText(this, "Почтовый клиент не найден", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Почтовый клиент не найден", Toast.LENGTH_SHORT).show()
             }
         }
 
-        userAgreementButton.setOnClickListener {
+        binding.userAgreementButton.setOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.user_agreement_url))))
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

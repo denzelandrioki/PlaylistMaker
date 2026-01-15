@@ -1,44 +1,45 @@
 package com.practicum.playlistmaker.presentation.search
 
-import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.appbar.MaterialToolbar
-import com.practicum.playlistmaker.databinding.ActivitySearchBinding
+import com.practicum.playlistmaker.databinding.FragmentSearchBinding
 import com.practicum.playlistmaker.domain.entity.Track
-import com.practicum.playlistmaker.presentation.player.PlayerActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : Fragment() {
 
-    private lateinit var binding: ActivitySearchBinding
+    private var _binding: FragmentSearchBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: SearchViewModel by viewModel()
 
     private lateinit var tracksAdapter: TracksAdapter
     private lateinit var historyAdapter: TracksAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        val toolbar: MaterialToolbar = binding.searchToolbar
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setNavigationOnClickListener { finish() }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         tracksAdapter = TracksAdapter(mutableListOf()) { onTrackClicked(it) }
-        binding.tracksRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.tracksRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.tracksRecyclerView.adapter = tracksAdapter
 
         historyAdapter = TracksAdapter(mutableListOf()) { onTrackClicked(it) }
-        binding.historyRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.historyRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.historyRecyclerView.adapter = historyAdapter
 
         binding.clearButton.setOnClickListener { binding.searchEditText.text?.clear() }
@@ -59,7 +60,7 @@ class SearchActivity : AppCompatActivity() {
 
         binding.retryButton.setOnClickListener { viewModel.onRetry() }
 
-        viewModel.state.observe(this) { st ->
+        viewModel.state.observe(viewLifecycleOwner) { st ->
             when (st) {
                 is SearchState.Loading -> { setAllGone(); binding.progressBar.isVisible = true }
                 is SearchState.Content -> { setAllGone(); binding.tracksRecyclerView.isVisible = true; tracksAdapter.setData(st.items) }
@@ -81,11 +82,23 @@ class SearchActivity : AppCompatActivity() {
 
     private fun onTrackClicked(track: Track) {
         viewModel.onClickTrack(track)
-        startActivity(Intent(this, PlayerActivity::class.java).putExtra(PlayerActivity.EXTRA_TRACK, track))
+        // Навигация будет через Navigation Component
+        val navController = androidx.navigation.Navigation.findNavController(requireView())
+        navController.navigate(
+            com.practicum.playlistmaker.R.id.action_searchFragment_to_playerFragment,
+            android.os.Bundle().apply {
+                putParcelable("track", track)
+            }
+        )
     }
 
     private fun hideKeyboard() {
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(binding.searchEditText.windowToken, 0)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
