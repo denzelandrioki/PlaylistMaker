@@ -60,6 +60,8 @@ dependencies {
     implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.runtime.ktx)
 
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
     implementation(libs.glide)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)

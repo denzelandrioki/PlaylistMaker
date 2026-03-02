@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
+/** Экран плеера: отображение трека и воспроизведение превью по previewUrl. */
 class PlayerFragment : Fragment() {
 
     private var _binding: FragmentPlayerBinding? = null
@@ -39,6 +40,7 @@ class PlayerFragment : Fragment() {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
+        // Обязательный аргумент из nav_graph (action_searchFragment_to_playerFragment)
         val track = arguments?.getParcelableCompat<Track>("track")
             ?: error("Track argument is missing")
 

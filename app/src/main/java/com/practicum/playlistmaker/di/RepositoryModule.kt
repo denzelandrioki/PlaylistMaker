@@ -7,6 +7,7 @@ import com.practicum.playlistmaker.domain.repository.PlayerRepository
 import com.practicum.playlistmaker.domain.repository.TracksRepository
 import org.koin.dsl.module
 
+/** Репозитории: TracksRepository (сеть + история), PlayerRepository (MediaPlayer). */
 val repositoryModule = module {
 
     // Репозиторий треков (сеть + gson + prefs + mapper)

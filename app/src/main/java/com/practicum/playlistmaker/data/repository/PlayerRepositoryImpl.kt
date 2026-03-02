@@ -5,6 +5,10 @@ import android.media.MediaPlayer
 import com.practicum.playlistmaker.domain.entity.PlayerState
 import com.practicum.playlistmaker.domain.repository.PlayerRepository
 
+/**
+ * Воспроизведение превью по URL через MediaPlayer.
+ * Состояние хранится локально; коллбэки onPrepared/onCompletion/onError вызываются с потока UI.
+ */
 class PlayerRepositoryImpl(
     private val mediaPlayerFactory: () -> MediaPlayer
 ) : PlayerRepository {

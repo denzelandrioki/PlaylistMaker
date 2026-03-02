@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Граф навигации: старт — Поиск; плеер открывается только из поиска с аргументом track -->
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -16,6 +17,7 @@
         android:name="com.practicum.playlistmaker.presentation.search.SearchFragment"
         android:label="Поиск"
         tools:layout="@layout/fragment_search">
+        <!-- Переход в плеер: передать Bundle с ключом "track" (Parcelable) -->
         <action
             android:id="@+id/action_searchFragment_to_playerFragment"
             app:destination="@id/playerFragment" />
@@ -32,6 +34,7 @@
         android:name="com.practicum.playlistmaker.presentation.player.PlayerFragment"
         android:label="Аудиоплеер"
         tools:layout="@layout/fragment_player">
+        <!-- Обязательный аргумент: Track для отображения и previewUrl -->
         <argument
             android:name="track"
             app:argType="com.practicum.playlistmaker.domain.entity.Track"

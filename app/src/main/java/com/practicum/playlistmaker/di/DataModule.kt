@@ -11,6 +11,7 @@ import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+/** Слой данных: API (Retrofit), SharedPreferences, Gson, маппер, PrefsRepository. */
 val dataModule = module {
 
     // Gson
