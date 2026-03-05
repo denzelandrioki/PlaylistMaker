@@ -11,8 +11,8 @@ import org.koin.dsl.module
 /** Регистрация ViewModel для Koin (по одному на экран/логический блок). */
 val viewModelModule = module {
     viewModel { SearchViewModel(get()) }
-    viewModel { PlayerViewModel(get()) }
+    viewModel { PlayerViewModel(get(), get()) }
     viewModel { SettingsViewModel(get()) }
-    viewModel { FavoritesViewModel() }
+    viewModel { FavoritesViewModel(get()) }
     viewModel { PlaylistsViewModel() }
 }

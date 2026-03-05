@@ -9,29 +9,47 @@
     tools:context=".presentation.media.FavoritesFragment">
 
     <!-- Пустое состояние: иконка и текст -->
-    <ImageView
-        android:id="@+id/emptyIcon"
-        style="@style/IconEmptyMedia"
-        android:contentDescription="@string/empty_media_library"
-        android:layout_marginTop="@dimen/empty_state_top_margin"
-        android:layout_marginStart="@dimen/empty_state_icon_margin"
-        android:layout_marginEnd="@dimen/empty_state_icon_margin"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="ContentDescription" />
-
-    <TextView
-        style="@style/TextEmptyFavor"
+    <LinearLayout
+        android:id="@+id/emptyStateGroup"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/empty_state_icon_text_gap"
-        android:layout_marginStart="@dimen/empty_state_text_margin"
-        android:layout_marginEnd="@dimen/empty_state_text_margin"
-        android:text="@string/empty_media_library"
-        app:layout_constraintTop_toBottomOf="@id/emptyIcon"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/emptyIcon"
+            style="@style/IconEmptyMedia"
+            android:contentDescription="@string/empty_media_library"
+            android:layout_marginTop="@dimen/empty_state_top_margin"
+            android:layout_marginStart="@dimen/empty_state_icon_margin"
+            android:layout_marginEnd="@dimen/empty_state_icon_margin"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            style="@style/TextEmptyFavor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/empty_state_icon_text_gap"
+            android:layout_marginStart="@dimen/empty_state_text_margin"
+            android:layout_marginEnd="@dimen/empty_state_text_margin"
+            android:text="@string/empty_media_library" />
+    </LinearLayout>
+
+    <!-- Список избранных треков -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/favoritesRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/item_track" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -7,6 +7,7 @@ data class PlayerUiState(
     val track: Track? = null,
     val state: PlayerState = PlayerState.IDLE,
     val progressMs: Int = 0,
-    val canPlay: Boolean = true,   // для кнопки
-    val canPause: Boolean = false  // для кнопки
+    val canPlay: Boolean = true,
+    val canPause: Boolean = false,
+    val isFavorite: Boolean = false,
 )

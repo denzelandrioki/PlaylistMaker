@@ -3,6 +3,7 @@ package com.practicum.playlistmaker.data.repository
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.practicum.playlistmaker.data.db.AppDatabase
 import com.practicum.playlistmaker.data.mapper.TrackMapper
 import com.practicum.playlistmaker.data.network.ItunesApi
 import com.practicum.playlistmaker.domain.entity.Track
@@ -13,27 +14,36 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 
 /**
- * Реализация репозитория треков: поиск через iTunes API (suspend) и локальная история в SharedPreferences.
- * search() возвращает Flow с одним Result.
+ * Реализация репозитория треков: поиск через iTunes API, история в SharedPreferences.
+ * Для результатов поиска и истории выставляется isFavorite по данным БД избранного.
  */
 class TracksRepositoryImpl(
     private val api: ItunesApi,
     private val mapper: TrackMapper,
     private val gson: Gson,
-    private val prefs: SharedPreferences
+    private val prefs: SharedPreferences,
+    private val db: AppDatabase
 ) : TracksRepository {
 
     override fun search(query: String): Flow<Result<List<Track>>> = flow {
         val result = withContext(Dispatchers.IO) {
             runCatching {
                 val response = api.search(query)
-                response.results.map { mapper.fromDto(it) }
+                val list = response.results.map { mapper.fromDto(it) }
+                val favoriteIds = db.favoriteTracksDao().getFavoriteTrackIds()
+                list.forEach { it.isFavorite = it.trackId in favoriteIds }
+                list
             }
         }
         emit(result)
     }
 
-    override fun getHistory(): List<Track> = readHistory()
+    override suspend fun getHistory(): List<Track> = withContext(Dispatchers.IO) {
+        val list = readHistory()
+        val favoriteIds = db.favoriteTracksDao().getFavoriteTrackIds()
+        list.forEach { it.isFavorite = it.trackId in favoriteIds }
+        list
+    }
 
     override fun addToHistory(track: Track) {
         val list = readHistory().toMutableList()

@@ -10,12 +10,13 @@ data class Track(
     val trackName: String,
     val artistName: String,
     val artworkUrl100: String?,
-    val trackTimeMillis: Long,       // <-- теперь НЕ nullable
+    val trackTimeMillis: Long,
     val collectionName: String?,
     val releaseDate: String?,
     val primaryGenreName: String?,
     val country: String?,
     val previewUrl: String?,
+    var isFavorite: Boolean = false,
 ) : Parcelable {
     /** URL обложки 512×512 для отображения в плеере. */
     fun cover512(): String? = artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg")

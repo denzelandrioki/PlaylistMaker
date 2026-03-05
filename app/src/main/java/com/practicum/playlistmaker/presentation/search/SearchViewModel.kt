@@ -30,13 +30,19 @@ class SearchViewModel(
     private val interactor: SearchInteractor
 ) : ViewModel() {
 
-    private val _state = MutableLiveData<SearchState>(SearchState.History(interactor.history()))
+    private val _state = MutableLiveData<SearchState>(SearchState.History(emptyList()))
     val state: LiveData<SearchState> = _state
 
     private var lastQuery: String? = null
     private var searchJob: Job? = null
     private var clickJob: Job? = null
     private var lastClickedTrack: Track? = null
+
+    init {
+        viewModelScope.launch {
+            _state.value = SearchState.History(interactor.history())
+        }
+    }
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY_MS = 2000L
@@ -49,7 +55,9 @@ class SearchViewModel(
         searchJob?.cancel()
 
         if (text.isBlank()) {
-            _state.value = SearchState.History(interactor.history())
+            viewModelScope.launch {
+                _state.value = SearchState.History(interactor.history())
+            }
             return
         }
 

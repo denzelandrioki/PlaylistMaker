@@ -1,7 +1,9 @@
 package com.practicum.playlistmaker.di
 
 import android.content.Context
+import androidx.room.Room
 import com.google.gson.Gson
+import com.practicum.playlistmaker.data.db.AppDatabase
 import com.practicum.playlistmaker.data.local.PrefsStorage
 import com.practicum.playlistmaker.data.mapper.TrackMapper
 import com.practicum.playlistmaker.data.network.ItunesApi
@@ -11,8 +13,13 @@ import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-/** Слой данных: API (Retrofit), SharedPreferences, Gson, маппер, PrefsRepository. */
+/** Слой данных: API (Retrofit), SharedPreferences, Gson, маппер, Room, PrefsRepository. */
 val dataModule = module {
+
+    single<AppDatabase> {
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "playlist_maker_db")
+            .build()
+    }
 
     // Gson
     single { Gson() }
