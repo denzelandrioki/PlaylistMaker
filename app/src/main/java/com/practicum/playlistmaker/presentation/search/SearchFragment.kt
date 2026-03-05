@@ -13,7 +13,6 @@ import com.practicum.playlistmaker.databinding.FragmentSearchBinding
 import com.practicum.playlistmaker.domain.entity.Track
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-/** Экран поиска: ввод запроса с дебаунсом, список результатов/история, переход в плеер по клику на трек. */
 class SearchFragment : Fragment() {
 
     private var _binding: FragmentSearchBinding? = null
@@ -61,7 +60,6 @@ class SearchFragment : Fragment() {
 
         binding.retryButton.setOnClickListener { viewModel.onRetry() }
 
-        // Единая точка отображения состояния поиска (Loading/Content/Empty/Error/History)
         viewModel.state.observe(viewLifecycleOwner) { st ->
             when (st) {
                 is SearchState.Loading -> { setAllGone(); binding.progressBar.isVisible = true }
@@ -84,7 +82,7 @@ class SearchFragment : Fragment() {
 
     private fun onTrackClicked(track: Track) {
         viewModel.onClickTrack(track)
-        // Переход в плеер с аргументом track (см. nav_graph: playerFragment argument)
+        // Навигация будет через Navigation Component
         val navController = androidx.navigation.Navigation.findNavController(requireView())
         navController.navigate(
             com.practicum.playlistmaker.R.id.action_searchFragment_to_playerFragment,

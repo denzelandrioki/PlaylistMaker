@@ -3,60 +3,61 @@ package com.practicum.playlistmaker.data.repository
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.practicum.playlistmaker.data.db.AppDatabase
+import com.practicum.playlistmaker.data.dto.SearchResponseDto
 import com.practicum.playlistmaker.data.mapper.TrackMapper
 import com.practicum.playlistmaker.data.network.ItunesApi
 import com.practicum.playlistmaker.domain.entity.Track
 import com.practicum.playlistmaker.domain.repository.TracksRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.withContext
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-/**
- * Реализация репозитория треков: поиск через iTunes API, история в SharedPreferences.
- * Для результатов поиска и истории выставляется isFavorite по данным БД избранного.
- */
 class TracksRepositoryImpl(
     private val api: ItunesApi,
     private val mapper: TrackMapper,
     private val gson: Gson,
-    private val prefs: SharedPreferences,
-    private val db: AppDatabase
+    private val prefs: SharedPreferences
 ) : TracksRepository {
 
-    override fun search(query: String): Flow<Result<List<Track>>> = flow {
-        val result = withContext(Dispatchers.IO) {
-            runCatching {
-                val response = api.search(query)
-                val list = response.results.map { mapper.fromDto(it) }
-                val favoriteIds = db.favoriteTracksDao().getFavoriteTrackIds()
-                list.forEach { it.isFavorite = it.trackId in favoriteIds }
-                list
+    override fun search(query: String, callback: (Result<List<Track>>) -> Unit) {
+        api.search(query).enqueue(object : Callback<SearchResponseDto> {
+            override fun onResponse(
+                call: Call<SearchResponseDto>,
+                response: Response<SearchResponseDto>
+            ) {
+                if (!response.isSuccessful) {
+                    callback(Result.failure(IllegalStateException("HTTP ${response.code()}")))
+                    return
+                }
+                val body = response.body()
+                val list = body?.results.orEmpty().map { mapper.fromDto(it) }
+                callback(Result.success(list))
             }
-        }
-        emit(result)
+
+            override fun onFailure(call: Call<SearchResponseDto>, t: Throwable) {
+                callback(Result.failure(t))
+            }
+        })
     }
 
-    override suspend fun getHistory(): List<Track> = withContext(Dispatchers.IO) {
-        val list = readHistory()
-        val favoriteIds = db.favoriteTracksDao().getFavoriteTrackIds()
-        list.forEach { it.isFavorite = it.trackId in favoriteIds }
-        list
-    }
+    override fun getHistory(): List<Track> = readHistory()
 
     override fun addToHistory(track: Track) {
         val list = readHistory().toMutableList()
+        // убрать дубликаты по trackId
         list.removeAll { it.trackId == track.trackId }
+        // ограничить размер (до 10): если переполнено — убрать последний элемент
         if (list.size >= MAX_HISTORY && list.isNotEmpty()) {
-            list.removeAt(list.lastIndex)
+            list.removeAt(list.lastIndex) // <-- вместо removeLast() (API 35)
         }
+        // добавить в начало
         list.add(0, track)
         writeHistory(list)
     }
 
     override fun clearHistory() = writeHistory(emptyList())
 
+    // --- приватные помощники ---
     private fun readHistory(): List<Track> {
         val json = prefs.getString(KEY_HISTORY, null) ?: return emptyList()
         return runCatching { gson.fromJson<List<Track>>(json, typeTrackList) }

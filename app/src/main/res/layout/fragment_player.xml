@@ -116,11 +116,8 @@
             app:layout_constraintBottom_toBottomOf="@id/playBtn"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="24dp"
-            android:background="@null"
-            android:src="@drawable/ic_fav_button_disabled"
-            app:tint="@null"
-            app:backgroundTint="@null"
-            android:contentDescription="@string/app_name"
+            android:background="@drawable/bg_fon_button"
+            android:src="@drawable/ic_favorite_24"
             android:elevation="0dp" />
 
         <!-- Прогресс воспроизведения -->

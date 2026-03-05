@@ -50,7 +50,4 @@
     <string name="new_playlist">Новый плейлист</string>
     <string name="empty_media_library">Ваша медиатека пуста</string>
     <string name="no_playlists_message">Вы не создали\nни одного плейлиста</string>
-
-    <!-- Для тега атрибуции воспроизведения аудио (manifest) -->
-    <string name="audio_playback_attribution">Воспроизведение аудиопревью</string>
 </resources>

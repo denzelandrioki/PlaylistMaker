@@ -5,16 +5,10 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET"/>
 
-    <!-- Тег атрибуции для воспроизведения аудио (устраняет предупреждения AppOps) -->
-    <attribution
-        android:tag="audioPlayback"
-        android:label="@string/audio_playback_attribution" />
-
     <application
         android:name=".app.App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
-        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"

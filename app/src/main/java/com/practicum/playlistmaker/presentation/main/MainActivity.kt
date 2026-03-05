@@ -11,12 +11,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivityMainBinding
 
-/**
- * Единственная Activity: контейнер для Navigation Component и нижней навигации.
- * Граф навигации задаётся в nav_graph.xml, стартовый destination — searchFragment.
- */
 class MainActivity : AppCompatActivity() {
-
+    
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigationView.setupWithNavController(navController)
 
-        // На экране плеера нижняя панель скрывается (переход из поиска по треку)
+        // Скрываем BottomNavigationView на экране PlayerFragment
         navController.addOnDestinationChangedListener { _, destination, _ ->
             val isPlayerFragment = destination.id == R.id.playerFragment
             binding.bottomNavigationView.visibility = if (isPlayerFragment) android.view.View.GONE else android.view.View.VISIBLE

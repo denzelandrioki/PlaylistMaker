@@ -3,21 +3,18 @@ package com.practicum.playlistmaker.domain.entity
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
-/** Доменная модель трека; Parcelable для передачи в аргументах Navigation. */
 @Parcelize
 data class Track(
     val trackId: Long,
     val trackName: String,
     val artistName: String,
     val artworkUrl100: String?,
-    val trackTimeMillis: Long,
+    val trackTimeMillis: Long,       // <-- теперь НЕ nullable
     val collectionName: String?,
     val releaseDate: String?,
     val primaryGenreName: String?,
     val country: String?,
     val previewUrl: String?,
-    var isFavorite: Boolean = false,
 ) : Parcelable {
-    /** URL обложки 512×512 для отображения в плеере. */
     fun cover512(): String? = artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg")
 }

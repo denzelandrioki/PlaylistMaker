@@ -5,40 +5,37 @@
     android:layout_width="match_parent"
     android:layout_height="64dp">
 
-    <!-- Обложка 45×45: отступ слева 13dp по макету, 8dp сверху/снизу -->
     <ImageView
         android:id="@+id/cover"
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:scaleType="centerCrop"
-        android:layout_marginStart="@dimen/track_item_start_margin"
-        android:layout_marginTop="@dimen/item_margin"
-        android:layout_marginBottom="@dimen/item_margin"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <!-- Стрелка: отступ справа 18dp по макету -->
     <ImageView
         android:id="@+id/arrow"
         android:layout_width="8dp"
         android:layout_height="14dp"
         android:src="@drawable/ic_arrow_right"
-        android:layout_marginEnd="@dimen/track_item_arrow_end_margin"
+        android:layout_marginEnd="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <!-- Название и подзаголовок: 8dp от обложки по макету -->
     <TextView
         android:id="@+id/trackName"
         style="@style/TextNoTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/track_item_cover_text_gap"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="14dp"
         android:layout_marginBottom="28dp"
-        android:layout_marginEnd="@dimen/track_item_cover_text_gap"
+        android:layout_marginEnd="12dp"
         android:maxLines="1"
         android:ellipsize="end"
         app:layout_constraintStart_toEndOf="@id/cover"
@@ -51,7 +48,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="@dimen/track_item_cover_text_gap"
+        android:layout_marginEnd="12dp"
         android:maxLines="1"
         android:ellipsize="middle"
         app:layout_constraintStart_toStartOf="@id/trackName"
