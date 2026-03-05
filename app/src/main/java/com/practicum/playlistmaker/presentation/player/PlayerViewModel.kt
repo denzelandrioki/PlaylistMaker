@@ -18,19 +18,11 @@ private const val TICK_MS = 300L
 
 /**
  * ViewModel экрана плеера.
-<<<<<<< Updated upstream
- * Прогресс обновляется корутиной раз в 300 мс; избранное через FavoritesInteractor.
- */
-class PlayerViewModel(
-    private val player: PlayerInteractor,
-    private val favoritesInteractor: FavoritesInteractor
-=======
  * isFavorite загружается при входе на экран (setTrack), а не из репозитория поиска.
  */
 class PlayerViewModel(
     private val player: PlayerInteractor,
     private val favorites: FavoritesInteractor,
->>>>>>> Stashed changes
 ) : ViewModel() {
 
     private val _ui = MutableLiveData(PlayerUiState())
@@ -39,14 +31,6 @@ class PlayerViewModel(
     private var progressJob: Job? = null
     private var currentTrack: Track? = null
 
-<<<<<<< Updated upstream
-    /** Установить текущий трек (вызывается при открытии экрана). */
-    fun setTrack(track: Track) {
-        _ui.value = _ui.value!!.copy(track = track, isFavorite = track.isFavorite)
-    }
-
-    /** Вызывается при открытии экрана: загрузка превью по URL, коллбэки — на главном потоке. */
-=======
     /** Вызывается при открытии экрана: сохраняем трек и запрашиваем актуальное isFavorite из БД. */
     fun setTrack(track: Track) {
         currentTrack = track
@@ -57,7 +41,6 @@ class PlayerViewModel(
     }
 
     /** Загрузка превью по URL. Вызывать после setTrack(track). */
->>>>>>> Stashed changes
     fun prepare(url: String) {
         player.prepare(
             url = url,
@@ -98,7 +81,7 @@ class PlayerViewModel(
         val track = currentTrack ?: return
         viewModelScope.launch {
             if (_ui.value!!.isFavorite) {
-                favorites.removeFromFavorites(track.trackId)
+                favorites.removeFromFavorites(trackId = track.trackId)
                 _ui.postValue(_ui.value!!.copy(isFavorite = false))
             } else {
                 favorites.addToFavorites(track)
@@ -123,21 +106,6 @@ class PlayerViewModel(
     private fun stopProgressTicker() {
         progressJob?.cancel()
         progressJob = null
-    }
-
-    /** Нажатие на кнопку «Нравится»: добавить в избранное или удалить. */
-    fun onFavoriteClicked() {
-        val current = _ui.value ?: return
-        val track = current.track ?: return
-        viewModelScope.launch {
-            if (current.isFavorite) {
-                favoritesInteractor.removeFromFavorites(track)
-                _ui.postValue(current.copy(isFavorite = false))
-            } else {
-                favoritesInteractor.addToFavorites(track)
-                _ui.postValue(current.copy(isFavorite = true))
-            }
-        }
     }
 
     override fun onCleared() {

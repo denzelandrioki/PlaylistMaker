@@ -12,15 +12,8 @@ import org.koin.dsl.module
 
 /** Интеракторы (use cases): поиск, плеер, настройки, избранное. */
 val interactorModule = module {
-<<<<<<< Updated upstream
-    factory<SearchInteractor>     { SearchInteractorImpl(get()) }
-    factory<PlayerInteractor>     { PlayerInteractorImpl(get()) }
-    factory<SettingsInteractor>   { SettingsInteractorImpl(get()) }
-    factory<FavoritesInteractor>  { FavoritesInteractorImpl(get()) }
-=======
     factory<SearchInteractor>    { SearchInteractorImpl(get()) }
     factory<PlayerInteractor>   { PlayerInteractorImpl(get()) }
     factory<SettingsInteractor>  { SettingsInteractorImpl(get()) }
     factory<FavoritesInteractor> { FavoritesInteractorImpl(get()) }
->>>>>>> Stashed changes
 }

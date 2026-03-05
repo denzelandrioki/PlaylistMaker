@@ -11,15 +11,9 @@
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:scaleType="centerCrop"
-<<<<<<< Updated upstream
-        android:layout_marginStart="@dimen/track_item_start_margin"
-        android:layout_marginTop="@dimen/item_margin"
-        android:layout_marginBottom="@dimen/item_margin"
-=======
         android:layout_marginStart="13dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
->>>>>>> Stashed changes
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -30,11 +24,7 @@
         android:layout_width="8dp"
         android:layout_height="14dp"
         android:src="@drawable/ic_arrow_right"
-<<<<<<< Updated upstream
-        android:layout_marginEnd="@dimen/track_item_arrow_end_margin"
-=======
         android:layout_marginEnd="18dp"
->>>>>>> Stashed changes
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>

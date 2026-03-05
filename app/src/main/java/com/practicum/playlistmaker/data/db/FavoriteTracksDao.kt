@@ -13,8 +13,11 @@ interface FavoriteTracksDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(track: FavoriteTrackEntity)
 
-    @Delete
-    suspend fun delete(track: FavoriteTrackEntity)
+    @Query("DELETE FROM favorite_tracks WHERE trackId = :trackId")
+    suspend fun deleteByTrackId(trackId: Long)
+
+    @Query("SELECT 1 FROM favorite_tracks WHERE trackId = :trackId LIMIT 1")
+    suspend fun isFavorite(trackId: Long): Boolean?
 
     @Query("SELECT * FROM favorite_tracks ORDER BY addedAt DESC")
     fun getAllFavorites(): Flow<List<FavoriteTrackEntity>>

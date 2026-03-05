@@ -58,10 +58,6 @@ class PlayerFragment : Fragment() {
                 if (ui.state == PlayerState.PLAYING) R.drawable.ic_pause_32
                 else R.drawable.ic_play_32
             )
-<<<<<<< Updated upstream
-            // 4 состояния из макета: light/dark × enabled/disabled (тема выбирает drawable автоматически)
-=======
->>>>>>> Stashed changes
             binding.favBtn.setImageResource(
                 if (ui.isFavorite) R.drawable.ic_fav_button_enabled else R.drawable.ic_fav_button_disabled
             )
