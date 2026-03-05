@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
+/** Экран плеера: отображение трека и воспроизведение превью по previewUrl. */
 class PlayerFragment : Fragment() {
 
     private var _binding: FragmentPlayerBinding? = null
@@ -39,13 +40,16 @@ class PlayerFragment : Fragment() {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
+        // Обязательный аргумент из nav_graph (action_searchFragment_to_playerFragment или из медиатеки)
         val track = arguments?.getParcelableCompat<Track>("track")
             ?: error("Track argument is missing")
 
+        viewModel.setTrack(track)
         bindTrack(track)
         viewModel.prepare(track.previewUrl.orEmpty())
 
         binding.playBtn.setOnClickListener { viewModel.playPause() }
+        binding.favBtn.setOnClickListener { viewModel.onFavoriteClicked() }
 
         viewModel.ui.observe(viewLifecycleOwner) { ui ->
             binding.progressText.text = formatMs(ui.progressMs)
@@ -53,6 +57,11 @@ class PlayerFragment : Fragment() {
                 if (ui.state == PlayerState.PLAYING) R.drawable.ic_pause_32
                 else R.drawable.ic_play_32
             )
+            // 4 состояния из макета: light/dark × enabled/disabled (тема выбирает drawable автоматически)
+            binding.favBtn.setImageResource(
+                if (ui.isFavorite) R.drawable.ic_fav_button_enabled else R.drawable.ic_fav_button_disabled
+            )
+            binding.favBtn.imageTintList = null
             if (ui.state == PlayerState.COMPLETED) binding.progressText.text = "00:00"
         }
     }

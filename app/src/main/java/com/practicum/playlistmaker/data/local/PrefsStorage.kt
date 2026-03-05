@@ -3,6 +3,7 @@ package com.practicum.playlistmaker.data.local
 import android.content.SharedPreferences
 import com.practicum.playlistmaker.domain.repository.PrefsRepository
 
+/** Реализация PrefsRepository: тёмная тема в SharedPreferences. */
 class PrefsStorage(
     private val prefs: SharedPreferences
 ) : PrefsRepository {

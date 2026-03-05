@@ -3,6 +3,7 @@ package com.practicum.playlistmaker.domain.interactor
 import com.practicum.playlistmaker.domain.entity.PlayerState
 import com.practicum.playlistmaker.domain.repository.PlayerRepository
 
+/** Слой между UI и PlayerRepository: подготовка, воспроизведение, состояние. */
 interface PlayerInteractor {
     fun prepare(url: String, onPrepared: () -> Unit, onComplete: () -> Unit, onError: (Throwable) -> Unit = {})
     fun play()

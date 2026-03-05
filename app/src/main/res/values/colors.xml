@@ -29,4 +29,6 @@
 
     <color name="searchField_light">#E7EAF2</color>
     <color name="searchField_dark">#FFFFFF</color>
+
+    <color name="favorite_heart_red">#F56B6C</color>
 </resources>

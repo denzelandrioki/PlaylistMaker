@@ -2,6 +2,7 @@ package com.practicum.playlistmaker.domain.repository
 
 import com.practicum.playlistmaker.domain.entity.PlayerState
 
+/** Контракт воспроизведения: подготовка по URL, play/pause/stop, позиция и состояние. */
 interface PlayerRepository {
     fun prepare(
         url: String?,

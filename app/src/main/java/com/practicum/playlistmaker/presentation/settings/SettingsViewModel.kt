@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.practicum.playlistmaker.domain.interactor.SettingsInteractor
 
+/** ViewModel настроек: тёмная тема через SettingsInteractor и немедленное применение в UI. */
 class SettingsViewModel(
     private val settings: SettingsInteractor
 ) : ViewModel() {
