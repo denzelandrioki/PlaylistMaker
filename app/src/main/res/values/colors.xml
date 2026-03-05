@@ -30,5 +30,9 @@
     <color name="searchField_light">#E7EAF2</color>
     <color name="searchField_dark">#FFFFFF</color>
 
+<<<<<<< Updated upstream
     <color name="favorite_heart_red">#F56B6C</color>
+=======
+    <color name="favorite_active">#F56B6C</color>
+>>>>>>> Stashed changes
 </resources>

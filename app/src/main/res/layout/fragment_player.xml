@@ -120,7 +120,11 @@
             android:src="@drawable/ic_fav_button_disabled"
             app:tint="@null"
             app:backgroundTint="@null"
+<<<<<<< Updated upstream
             android:contentDescription="@string/app_name"
+=======
+            android:contentDescription="@string/favorites_button"
+>>>>>>> Stashed changes
             android:elevation="0dp" />
 
         <!-- Прогресс воспроизведения -->

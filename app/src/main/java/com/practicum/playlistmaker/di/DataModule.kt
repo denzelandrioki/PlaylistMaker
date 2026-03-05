@@ -16,8 +16,15 @@ import retrofit2.converter.gson.GsonConverterFactory
 /** Слой данных: API (Retrofit), SharedPreferences, Gson, маппер, Room, PrefsRepository. */
 val dataModule = module {
 
+<<<<<<< Updated upstream
     single<AppDatabase> {
         Room.databaseBuilder(androidContext(), AppDatabase::class.java, "playlist_maker_db")
+=======
+    // Room
+    single<AppDatabase> {
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "playlist_maker_db")
+            .fallbackToDestructiveMigration()
+>>>>>>> Stashed changes
             .build()
     }
 

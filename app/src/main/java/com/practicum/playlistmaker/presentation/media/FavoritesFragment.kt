@@ -20,7 +20,11 @@ class FavoritesFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: FavoritesViewModel by viewModel()
+<<<<<<< Updated upstream
     private lateinit var adapter: TracksAdapter
+=======
+    private val adapter = TracksAdapter { track -> openPlayer(track) }
+>>>>>>> Stashed changes
 
     companion object {
         fun newInstance() = FavoritesFragment()
@@ -37,6 +41,7 @@ class FavoritesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+<<<<<<< Updated upstream
         adapter = TracksAdapter(mutableListOf()) { track -> onTrackClicked(track) }
         binding.favoritesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.favoritesRecyclerView.adapter = adapter
@@ -52,13 +57,34 @@ class FavoritesFragment : Fragment() {
                     binding.favoritesRecyclerView.isVisible = true
                     adapter.setData(state.tracks)
                 }
+=======
+        binding.favoritesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.favoritesRecyclerView.adapter = adapter
+        viewModel.list.observe(viewLifecycleOwner) { tracks ->
+            if (tracks.isEmpty()) {
+                binding.favoritesRecyclerView.visibility = View.GONE
+                binding.emptyIcon.visibility = View.VISIBLE
+                binding.emptyText.visibility = View.VISIBLE
+            } else {
+                binding.emptyIcon.visibility = View.GONE
+                binding.emptyText.visibility = View.GONE
+                binding.favoritesRecyclerView.visibility = View.VISIBLE
+                adapter.setData(tracks)
+>>>>>>> Stashed changes
             }
         }
     }
 
+<<<<<<< Updated upstream
     private fun onTrackClicked(track: Track) {
         val navController = Navigation.findNavController(requireView())
         navController.navigate(
+=======
+    private fun openPlayer(track: Track) {
+        val navController = view?.let { Navigation.findNavController(it) }
+            ?: (parentFragment?.view?.let { Navigation.findNavController(it) })
+        navController?.navigate(
+>>>>>>> Stashed changes
             R.id.action_mediaFragment_to_playerFragment,
             Bundle().apply { putParcelable("track", track) }
         )

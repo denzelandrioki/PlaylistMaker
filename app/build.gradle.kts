@@ -1,8 +1,12 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.ksp)
     id("kotlin-parcelize")
+<<<<<<< Updated upstream
     id("com.google.devtools.ksp")
+=======
+>>>>>>> Stashed changes
 }
 
 android {
@@ -76,8 +80,14 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.8.4")
 
     // Room
+<<<<<<< Updated upstream
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
+=======
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+>>>>>>> Stashed changes
 }
 

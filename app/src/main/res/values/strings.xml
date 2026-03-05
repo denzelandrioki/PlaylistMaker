@@ -45,6 +45,7 @@
     <string name="label_country">Страна</string>
 
     <!-- Медиатека -->
+    <string name="favorites_button">Добавить в избранное</string>
     <string name="favorite_tracks">Избранные треки</string>
     <string name="playlists">Плейлисты</string>
     <string name="new_playlist">Новый плейлист</string>

@@ -8,9 +8,39 @@
     android:background="?attr/colorSurface"
     tools:context=".presentation.media.FavoritesFragment">
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/favoritesRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/item_track"
+        tools:visibility="visible" />
+
     <!-- Пустое состояние: иконка и текст -->
+<<<<<<< Updated upstream
     <LinearLayout
         android:id="@+id/emptyStateGroup"
+=======
+    <ImageView
+        android:id="@+id/emptyIcon"
+        style="@style/IconEmptyMedia"
+        android:contentDescription="@string/empty_media_library"
+        android:layout_marginTop="@dimen/empty_state_top_margin"
+        android:layout_marginStart="@dimen/empty_state_icon_margin"
+        android:layout_marginEnd="@dimen/empty_state_icon_margin"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/emptyText"
+        style="@style/TextEmptyFavor"
+>>>>>>> Stashed changes
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
