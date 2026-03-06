@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 /** Контракт: поиск треков (сеть) и локальная история поиска. Поиск возвращает Flow. */
 interface TracksRepository {
     fun search(query: String): Flow<Result<List<Track>>>
-    fun getHistory(): List<Track>
+    suspend fun getHistory(): List<Track>
     fun addToHistory(track: Track)
     fun clearHistory()
 }

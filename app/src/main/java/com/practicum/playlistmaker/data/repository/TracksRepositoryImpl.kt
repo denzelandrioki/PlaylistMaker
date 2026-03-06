@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 
 /**
- * Реализация репозитория треков: поиск через iTunes API (suspend) и локальная история в SharedPreferences.
- * search() возвращает Flow с одним Result.
+ * Реализация репозитория треков: поиск через iTunes API, история в SharedPreferences.
+ * isFavorite не выставляется здесь — только во ViewModel плеера при входе на экран.
  */
 class TracksRepositoryImpl(
     private val api: ItunesApi,
@@ -33,7 +33,9 @@ class TracksRepositoryImpl(
         emit(result)
     }
 
-    override fun getHistory(): List<Track> = readHistory()
+    override suspend fun getHistory(): List<Track> = withContext(Dispatchers.IO) {
+        readHistory()
+    }
 
     override fun addToHistory(track: Track) {
         val list = readHistory().toMutableList()

@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.domain.entity.PlayerState
+import com.practicum.playlistmaker.domain.entity.Track
+import com.practicum.playlistmaker.domain.interactor.FavoritesInteractor
 import com.practicum.playlistmaker.domain.interactor.PlayerInteractor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -16,18 +18,29 @@ private const val TICK_MS = 300L
 
 /**
  * ViewModel экрана плеера.
- * Прогресс обновляется корутиной раз в 300 мс, останавливается при паузе, при завершении — 00:00.
+ * isFavorite загружается при входе на экран (setTrack), а не из репозитория поиска.
  */
 class PlayerViewModel(
-    private val player: PlayerInteractor
+    private val player: PlayerInteractor,
+    private val favorites: FavoritesInteractor,
 ) : ViewModel() {
 
     private val _ui = MutableLiveData(PlayerUiState())
     val ui: LiveData<PlayerUiState> = _ui
 
     private var progressJob: Job? = null
+    private var currentTrack: Track? = null
 
-    /** Вызывается при открытии экрана: загрузка превью по URL, коллбэки — на главном потоке. */
+    /** Вызывается при открытии экрана: сохраняем трек и запрашиваем актуальное isFavorite из БД. */
+    fun setTrack(track: Track) {
+        currentTrack = track
+        viewModelScope.launch {
+            val isFav = favorites.isFavorite(track.trackId)
+            _ui.postValue(_ui.value!!.copy(track = track, isFavorite = isFav))
+        }
+    }
+
+    /** Загрузка превью по URL. Вызывать после setTrack(track). */
     fun prepare(url: String) {
         player.prepare(
             url = url,
@@ -60,7 +73,21 @@ class PlayerViewModel(
 
     private fun onCompletion() {
         stopProgressTicker()
-        _ui.postValue(PlayerUiState(state = PlayerState.COMPLETED, progressMs = 0))
+        _ui.postValue(_ui.value!!.copy(state = PlayerState.COMPLETED, progressMs = 0))
+    }
+
+    /** Добавить/удалить текущий трек из избранного. Состояние обновляется по актуальным данным. */
+    fun onFavoriteClicked() {
+        val track = currentTrack ?: return
+        viewModelScope.launch {
+            if (_ui.value!!.isFavorite) {
+                favorites.removeFromFavorites(trackId = track.trackId)
+                _ui.postValue(_ui.value!!.copy(isFavorite = false))
+            } else {
+                favorites.addToFavorites(track)
+                _ui.postValue(_ui.value!!.copy(isFavorite = true))
+            }
+        }
     }
 
     /** Корутина: обновление прогресса раз в 300 мс. Явно сохраняем state = PLAYING, чтобы не перезаписать его старым значением из-за порядка postValue. */

@@ -13,7 +13,7 @@ import com.practicum.playlistmaker.databinding.ActivityMainBinding
 
 /**
  * Единственная Activity: контейнер для Navigation Component и нижней навигации.
- * Граф навигации задаётся в nav_graph.xml, стартовый destination — searchFragment.
+ * Граф навигации задаётся в nav_graph.xml, стартовый destination — mediaFragment (Медиатека).
  */
 class MainActivity : AppCompatActivity() {
 
