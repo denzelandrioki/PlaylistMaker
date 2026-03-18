@@ -1,7 +1,6 @@
 package com.practicum.playlistmaker.presentation.createplaylist
 
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,6 +11,9 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import android.view.Gravity
 import androidx.navigation.fragment.findNavController
@@ -19,6 +21,7 @@ import com.bumptech.glide.Glide
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentCreatePlaylistBinding
 import com.practicum.playlistmaker.domain.entity.Track
+import com.practicum.playlistmaker.util.getParcelableCompat
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import android.widget.Toast
 
@@ -53,6 +56,13 @@ class CreatePlaylistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(v.paddingLeft, v.paddingTop, v.paddingRight, systemBars.bottom)
+            insets
+        }
+        ViewCompat.requestApplyInsets(binding.root)
+
         arguments?.getParcelableCompat<Track>("trackToAdd")?.let { viewModel.setTrackToAdd(it) }
 
         binding.toolbar.setNavigationOnClickListener { viewModel.onBackPressed() }
@@ -66,10 +76,11 @@ class CreatePlaylistFragment : Fragment() {
             }
         )
 
-        binding.titleEdit.setText(viewModel.title.value)
-        binding.descriptionEdit.setText(viewModel.description.value)
-        if (viewModel.coverUri.value != null) {
-            Glide.with(this).load(viewModel.coverUri.value).centerCrop().into(binding.coverImage)
+        val state = viewModel.state.value
+        binding.titleEdit.setText(state?.title)
+        binding.descriptionEdit.setText(state?.description)
+        if (state?.coverUri != null) {
+            Glide.with(this).load(state.coverUri).centerCrop().into(binding.coverImage)
             binding.coverPlaceholderIcon.visibility = View.GONE
         } else {
             binding.coverPlaceholderIcon.visibility = View.VISIBLE
@@ -94,30 +105,28 @@ class CreatePlaylistFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        viewModel.createButtonEnabled.observe(viewLifecycleOwner) { enabled ->
-            binding.createButton.isEnabled = enabled
+        viewModel.state.observe(viewLifecycleOwner) { s ->
+            if (s.coverUri != null) {
+                Glide.with(this).load(s.coverUri).centerCrop().into(binding.coverImage)
+                binding.coverPlaceholderIcon.visibility = View.GONE
+            } else {
+                binding.coverPlaceholderIcon.visibility = View.VISIBLE
+            }
+            binding.createButton.isEnabled = s.createButtonEnabled
             binding.createButton.setBackgroundResource(
-                if (enabled) R.drawable.bg_button_create_activ else R.drawable.bg_button_create_default
+                if (s.createButtonEnabled) R.drawable.bg_button_create_activ else R.drawable.bg_button_create_default
             )
             binding.createButton.backgroundTintList = null
         }
 
-        viewModel.events.observe(viewLifecycleOwner) { event ->
+        viewModel.events.observeEvent(viewLifecycleOwner) { event ->
             when (event) {
-                is CreatePlaylistEvent.NavigateBack -> {
-                    viewModel.consumeEvent()
-                    findNavController().navigateUp()
-                }
-                is CreatePlaylistEvent.ShowDiscardDialog -> {
-                    showDiscardDialog()
-                    viewModel.consumeEvent()
-                }
+                is CreatePlaylistEvent.NavigateBack -> findNavController().navigateUp()
+                is CreatePlaylistEvent.ShowDiscardDialog -> showDiscardDialog()
                 is CreatePlaylistEvent.ShowToastAndNavigate -> {
-                    viewModel.consumeEvent()
                     showPlaylistCreatedToast(event.playlistName)
                     findNavController().navigateUp()
                 }
-                null -> {}
             }
         }
 
@@ -143,7 +152,7 @@ class CreatePlaylistFragment : Fragment() {
     }
 
     private fun showDiscardDialog() {
-        AlertDialog.Builder(requireContext())
+        val dialog = AlertDialog.Builder(requireContext())
             .setTitle(R.string.discard_dialog_title)
             .setMessage(R.string.discard_dialog_message)
             .setNegativeButton(R.string.discard_dialog_cancel) { _, _ ->
@@ -154,14 +163,10 @@ class CreatePlaylistFragment : Fragment() {
             }
             .setOnCancelListener { viewModel.onDiscardDialogDismissed() }
             .show()
+        val buttonColor = ContextCompat.getColor(requireContext(), R.color.primary_blue)
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(buttonColor)
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(buttonColor)
     }
-
-    @Suppress("DEPRECATION")
-    private inline fun <reified T : android.os.Parcelable> Bundle.getParcelableCompat(key: String): T? =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            getParcelable(key, T::class.java)
-        else
-            getParcelable(key)
 
     override fun onDestroyView() {
         super.onDestroyView()

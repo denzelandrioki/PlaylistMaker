@@ -22,7 +22,6 @@ val repositoryModule = module {
         PlaylistsRepositoryImpl(
             playlistsDao = get<AppDatabase>().playlistsDao(),
             playlistTracksDao = get<AppDatabase>().playlistTracksDao(),
-            gson = get(),
             context = androidContext(),
         )
     }

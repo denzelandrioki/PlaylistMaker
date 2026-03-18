@@ -4,7 +4,8 @@ import com.practicum.playlistmaker.domain.entity.Track
 
 object PlaylistTrackMapper {
 
-    fun Track.toPlaylistTrackEntity() = PlaylistTrackEntity(
+    fun Track.toPlaylistTrackEntity(playlistId: Long) = PlaylistTrackEntity(
+        playlistId = playlistId,
         trackId = trackId,
         artworkUrl100 = artworkUrl100,
         trackName = trackName,

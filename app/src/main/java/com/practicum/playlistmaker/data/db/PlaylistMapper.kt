@@ -1,31 +1,25 @@
 package com.practicum.playlistmaker.data.db
 
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import android.net.Uri
 import com.practicum.playlistmaker.domain.entity.Playlist
 
 object PlaylistMapper {
 
-    private val listLongType = object : TypeToken<List<Long>>() {}.type
+    fun PlaylistWithTracks.toPlaylist(): Playlist = Playlist(
+        id = playlist.id,
+        name = playlist.name,
+        description = playlist.description,
+        coverUri = playlist.coverPath?.let { Uri.parse("file://$it") },
+        trackIds = tracks.map { it.trackId },
+        trackCount = tracks.size,
+    )
 
-    fun PlaylistEntity.toPlaylist(gson: Gson): Playlist {
-        val ids = gson.fromJson<List<Long>>(trackIdsJson, listLongType) ?: emptyList()
-        return Playlist(
-            id = id,
-            name = name,
-            description = description,
-            coverPath = coverPath,
-            trackIds = ids,
-            trackCount = trackCount,
-        )
-    }
-
-    fun Playlist.toEntity(gson: Gson): PlaylistEntity = PlaylistEntity(
+    fun PlaylistEntity.toPlaylistEmpty(trackCount: Int = 0): Playlist = Playlist(
         id = id,
         name = name,
         description = description,
-        coverPath = coverPath,
-        trackIdsJson = gson.toJson(trackIds),
+        coverUri = coverPath?.let { Uri.parse("file://$it") },
+        trackIds = emptyList(),
         trackCount = trackCount,
     )
 }

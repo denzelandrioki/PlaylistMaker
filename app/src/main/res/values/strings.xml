@@ -63,9 +63,12 @@
     <string name="add_to_playlist_sheet_title">Добавить в плейлист</string>
     <string name="track_added_to_playlist_toast">Добавлено в плейлист %s</string>
     <string name="track_already_in_playlist_toast">Трек уже добавлен в плейлист %s</string>
-    <string name="tracks_count_one">%d трек</string>
-    <string name="tracks_count_few">%d трека</string>
-    <string name="tracks_count_many">%d треков</string>
+    <plurals name="tracks_count">
+        <item quantity="one">%d трек</item>
+        <item quantity="few">%d трека</item>
+        <item quantity="many">%d треков</item>
+        <item quantity="other">%d треков</item>
+    </plurals>
 
     <!-- Для тега атрибуции воспроизведения аудио (manifest) -->
     <string name="audio_playback_attribution">Воспроизведение аудиопревью</string>

@@ -13,6 +13,7 @@
         android:layout_height="48dp"
         android:scaleType="centerCrop"
         android:background="@drawable/cover_placeholder_playlist"
+        android:clipToOutline="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -28,10 +29,8 @@
         android:maxLines="1"
         android:ellipsize="end"
         app:layout_constraintStart_toEndOf="@id/playlistCover"
-        app:layout_constraintEnd_toStartOf="@id/playlistTrackCount"
-        app:layout_constraintTop_toTopOf="@id/playlistCover"
-        app:layout_constraintBottom_toBottomOf="@id/playlistCover"
-        app:layout_constraintVertical_bias="0.3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="Название плейлиста" />
 
     <TextView
@@ -39,9 +38,10 @@
         style="@style/BottomNavTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/playlistCover"
-        app:layout_constraintBottom_toBottomOf="@id/playlistCover"
+        android:layout_marginTop="4dp"
+        app:layout_constraintStart_toStartOf="@id/playlistTitle"
+        app:layout_constraintTop_toBottomOf="@id/playlistTitle"
+        app:layout_constraintBottom_toBottomOf="parent"
         tools:text="0 треков" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

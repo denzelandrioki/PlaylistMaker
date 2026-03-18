@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
@@ -16,9 +17,11 @@ interface PlaylistsDao {
     @Update
     suspend fun update(playlist: PlaylistEntity)
 
+    @Transaction
     @Query("SELECT * FROM playlists WHERE id = :id")
-    suspend fun getById(id: Long): PlaylistEntity?
+    suspend fun getByIdWithTracks(id: Long): PlaylistWithTracks?
 
+    @Transaction
     @Query("SELECT * FROM playlists ORDER BY id DESC")
-    fun getAllPlaylists(): Flow<List<PlaylistEntity>>
+    fun getAllPlaylistsWithTracks(): Flow<List<PlaylistWithTracks>>
 }

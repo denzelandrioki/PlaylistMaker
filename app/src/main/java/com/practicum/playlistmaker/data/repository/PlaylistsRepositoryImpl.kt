@@ -1,10 +1,9 @@
 package com.practicum.playlistmaker.data.repository
 
 import android.content.Context
-import com.google.gson.Gson
 import com.practicum.playlistmaker.data.db.PlaylistEntity
 import com.practicum.playlistmaker.data.db.PlaylistMapper.toPlaylist
-import com.practicum.playlistmaker.data.db.PlaylistMapper.toEntity
+import com.practicum.playlistmaker.data.db.PlaylistMapper.toPlaylistEmpty
 import com.practicum.playlistmaker.data.db.PlaylistTrackMapper.toPlaylistTrackEntity
 import com.practicum.playlistmaker.data.db.PlaylistsDao
 import com.practicum.playlistmaker.data.db.PlaylistTracksDao
@@ -19,7 +18,6 @@ import java.io.File
 class PlaylistsRepositoryImpl(
     private val playlistsDao: PlaylistsDao,
     private val playlistTracksDao: PlaylistTracksDao,
-    private val gson: Gson,
     private val context: Context,
 ) : PlaylistsRepository {
 
@@ -27,12 +25,13 @@ class PlaylistsRepositoryImpl(
         File(context.filesDir, "covers").apply { if (!exists()) mkdirs() }
     }
 
-    override fun getPlaylists(): Flow<List<Playlist>> = playlistsDao.getAllPlaylists()
-        .distinctUntilChanged()
-        .map { list -> list.map { it.toPlaylist(gson) } }
+    override fun getPlaylists(): Flow<List<Playlist>> =
+        playlistsDao.getAllPlaylistsWithTracks()
+            .distinctUntilChanged()
+            .map { list -> list.map { it.toPlaylist() } }
 
     override suspend fun getPlaylistById(id: Long): Playlist? =
-        playlistsDao.getById(id)?.toPlaylist(gson)
+        playlistsDao.getByIdWithTracks(id)?.toPlaylist()
 
     override suspend fun createPlaylist(name: String, description: String, coverUri: String?): Long {
         val entity = PlaylistEntity(
@@ -40,14 +39,12 @@ class PlaylistsRepositoryImpl(
             name = name.trim(),
             description = description.trim(),
             coverPath = null,
-            trackIdsJson = "[]",
-            trackCount = 0,
         )
         val id = playlistsDao.insert(entity)
         if (!coverUri.isNullOrBlank()) {
             val path = copyCoverToAppStorage(coverUri, id)
             if (path != null) {
-                val existing = playlistsDao.getById(id) ?: return id
+                val existing = playlistsDao.getByIdWithTracks(id)?.playlist ?: return id
                 playlistsDao.update(existing.copy(coverPath = path))
             }
         }
@@ -55,18 +52,12 @@ class PlaylistsRepositoryImpl(
     }
 
     override suspend fun updatePlaylistCover(playlistId: Long, coverPath: String) {
-        val existing = playlistsDao.getById(playlistId) ?: return
-        playlistsDao.update(existing.copy(coverPath = coverPath))
+        val withTracks = playlistsDao.getByIdWithTracks(playlistId) ?: return
+        playlistsDao.update(withTracks.playlist.copy(coverPath = coverPath))
     }
 
     override suspend fun addTrackToPlaylist(track: Track, playlist: Playlist) {
-        playlistTracksDao.insert(track.toPlaylistTrackEntity())
-        val newIds = (playlist.trackIds + track.trackId).distinct()
-        val updated = playlist.copy(
-            trackIds = newIds,
-            trackCount = newIds.size,
-        )
-        playlistsDao.update(updated.toEntity(gson))
+        playlistTracksDao.insert(track.toPlaylistTrackEntity(playlist.id))
     }
 
     private fun copyCoverToAppStorage(uriString: String, playlistId: Long): String? {

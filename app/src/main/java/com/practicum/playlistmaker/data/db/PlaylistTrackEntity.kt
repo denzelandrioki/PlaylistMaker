@@ -1,14 +1,28 @@
 package com.practicum.playlistmaker.data.db
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
- * Трек, добавленный хотя бы в один плейлист. Поля как у избранного — для отображения без сети.
+ * Трек в плейлисте (связь one-to-many с плейлистом). Поля как у избранного — для отображения без сети.
  */
-@Entity(tableName = "playlist_tracks")
+@Entity(
+    tableName = "playlist_tracks",
+    primaryKeys = ["playlistId", "trackId"],
+    foreignKeys = [
+        ForeignKey(
+            entity = PlaylistEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["playlistId"],
+            onDelete = ForeignKey.CASCADE,
+        )
+    ],
+    indices = [Index("playlistId")]
+)
 data class PlaylistTrackEntity(
-    @PrimaryKey
+    val playlistId: Long,
     val trackId: Long,
     val artworkUrl100: String?,
     val trackName: String,

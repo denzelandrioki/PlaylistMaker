@@ -27,7 +27,7 @@
     <color name="search_icon_dark" tools:ignore="MissingDefaultResource">#1A1B22</color>
 
     <!-- Экран создания плейлиста: подсказки видны на тёмном фоне, обводка полей -->
-    <color name="create_playlist_hint">#AEAFB4</color>
+    <color name="create_playlist_hint">@color/white</color>
     <color name="create_playlist_stroke_default">#AEAFB4</color>
     <color name="create_playlist_stroke_focused">#E6E8EB</color>
 

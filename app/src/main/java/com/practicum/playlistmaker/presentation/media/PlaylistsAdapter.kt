@@ -9,7 +9,6 @@ import com.bumptech.glide.Glide
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ItemPlaylistBinding
 import com.practicum.playlistmaker.domain.entity.Playlist
-import java.io.File
 
 class PlaylistsAdapter(
     private val onPlaylistClick: (Playlist) -> Unit,
@@ -31,33 +30,17 @@ class PlaylistsAdapter(
 
         fun bind(playlist: Playlist) {
             binding.playlistTitle.text = playlist.name
-            binding.playlistTrackCount.text = formatTrackCount(playlist.trackCount)
-            if (!playlist.coverPath.isNullOrBlank()) {
-                val file = File(playlist.coverPath)
-                if (file.exists()) {
-                    Glide.with(binding.root)
-                        .load(file)
-                        .centerCrop()
-                        .into(binding.playlistCover)
-                } else {
-                    binding.playlistCover.setImageResource(R.drawable.img_placeholder)
-                }
+            binding.playlistTrackCount.text = binding.root.context.resources
+                .getQuantityString(R.plurals.tracks_count, playlist.trackCount, playlist.trackCount)
+            if (playlist.coverUri != null) {
+                Glide.with(binding.root)
+                    .load(playlist.coverUri)
+                    .centerCrop()
+                    .into(binding.playlistCover)
             } else {
                 binding.playlistCover.setImageResource(R.drawable.img_placeholder)
             }
             binding.root.setOnClickListener { onPlaylistClick(playlist) }
-        }
-
-        private fun formatTrackCount(count: Int): String {
-            val mod10 = count % 10
-            val mod100 = count % 100
-            val format = when {
-                mod100 in 11..14 -> R.string.tracks_count_many
-                mod10 == 1 -> R.string.tracks_count_one
-                mod10 in 2..4 -> R.string.tracks_count_few
-                else -> R.string.tracks_count_many
-            }
-            return binding.root.context.getString(format, count)
         }
     }
 

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.domain.entity.Track
 import com.practicum.playlistmaker.domain.interactor.PlaylistsInteractor
+import com.practicum.playlistmaker.util.SingleLiveEvent
 import kotlinx.coroutines.launch
 
 sealed class CreatePlaylistEvent {
@@ -15,6 +16,13 @@ sealed class CreatePlaylistEvent {
     data class ShowToastAndNavigate(val playlistName: String) : CreatePlaylistEvent()
 }
 
+data class CreatePlaylistState(
+    val title: String = "",
+    val description: String = "",
+    val coverUri: String? = null,
+    val createButtonEnabled: Boolean = false,
+)
+
 class CreatePlaylistViewModel(
     private val playlists: PlaylistsInteractor,
 ) : ViewModel() {
@@ -22,29 +30,31 @@ class CreatePlaylistViewModel(
     /** Трек, который нужно добавить в новый плейлист (при переходе из плеера). */
     private var trackToAdd: Track? = null
 
-    private val _title = MutableLiveData("")
-    private val _description = MutableLiveData("")
-    private val _coverUri = MutableLiveData<String?>(null)
-    private val _createButtonEnabled = MutableLiveData(false)
-    private val _events = MutableLiveData<CreatePlaylistEvent?>()
+    private val _state = MutableLiveData(CreatePlaylistState())
+    val state: LiveData<CreatePlaylistState> = _state
 
-    val title: LiveData<String> = _title
-    val description: LiveData<String> = _description
-    val coverUri: LiveData<String?> = _coverUri
-    val createButtonEnabled: LiveData<Boolean> = _createButtonEnabled
-    val events: LiveData<CreatePlaylistEvent?> = _events
+    private val _events = SingleLiveEvent<CreatePlaylistEvent>()
+    val events: SingleLiveEvent<CreatePlaylistEvent> = _events
+
+    private fun updateState(block: CreatePlaylistState.() -> CreatePlaylistState) {
+        _state.value = (_state.value ?: CreatePlaylistState()).block()
+    }
 
     fun setTitle(value: String) {
-        _title.value = value
-        _createButtonEnabled.value = value.trim().isNotBlank()
+        updateState {
+            copy(
+                title = value,
+                createButtonEnabled = value.trim().isNotBlank(),
+            )
+        }
     }
 
     fun setDescription(value: String) {
-        _description.value = value
+        updateState { copy(description = value) }
     }
 
     fun setCoverUri(uri: String?) {
-        _coverUri.value = uri
+        updateState { copy(coverUri = uri) }
     }
 
     fun setTrackToAdd(track: Track?) {
@@ -52,10 +62,10 @@ class CreatePlaylistViewModel(
     }
 
     fun hasUnsavedData(): Boolean {
-        val t = _title.value?.trim().orEmpty()
-        val d = _description.value?.trim().orEmpty()
-        val hasCover = _coverUri.value != null
-        return t.isNotEmpty() || d.isNotEmpty() || hasCover
+        val s = _state.value ?: return false
+        val t = s.title.trim()
+        val d = s.description.trim()
+        return t.isNotEmpty() || d.isNotEmpty() || s.coverUri != null
     }
 
     fun onBackPressed() {
@@ -67,7 +77,7 @@ class CreatePlaylistViewModel(
     }
 
     fun onDiscardDialogDismissed() {
-        _events.value = null
+        // Диалог закрыт без действия — событие уже обработано
     }
 
     fun onDiscardConfirm() {
@@ -75,13 +85,14 @@ class CreatePlaylistViewModel(
     }
 
     fun createPlaylist() {
-        val name = _title.value?.trim().orEmpty()
+        val s = _state.value ?: return
+        val name = s.title.trim()
         if (name.isBlank()) return
         viewModelScope.launch {
             val id = playlists.createPlaylist(
                 name = name,
-                description = _description.value?.trim().orEmpty(),
-                coverUri = _coverUri.value,
+                description = s.description.trim(),
+                coverUri = s.coverUri,
             )
             trackToAdd?.let { track ->
                 playlists.getPlaylistById(id)?.let { playlist ->
@@ -90,9 +101,5 @@ class CreatePlaylistViewModel(
             }
             _events.postValue(CreatePlaylistEvent.ShowToastAndNavigate(name))
         }
-    }
-
-    fun consumeEvent() {
-        _events.value = null
     }
 }
