@@ -5,9 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlayerBinding
 import com.practicum.playlistmaker.domain.entity.PlayerState
@@ -23,6 +27,12 @@ class PlayerFragment : Fragment() {
     private var _binding: FragmentPlayerBinding? = null
     private val binding get() = _binding!!
     private val viewModel: PlayerViewModel by viewModel()
+
+    private var currentTrack: Track? = null
+
+    private val bottomSheetAdapter = PlaylistsBottomSheetAdapter { playlist ->
+        viewModel.addTrackToPlaylist(playlist)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,17 +50,18 @@ class PlayerFragment : Fragment() {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
-        // Обязательный аргумент из nav_graph (action_searchFragment_to_playerFragment или из медиатеки)
         val track = arguments?.getParcelableCompat<Track>("track")
             ?: error("Track argument is missing")
+        currentTrack = track
 
         viewModel.setTrack(track)
         bindTrack(track)
-        viewModel.setTrack(track)
         viewModel.prepare(track.previewUrl.orEmpty())
 
         binding.playBtn.setOnClickListener { viewModel.playPause() }
         binding.favBtn.setOnClickListener { viewModel.onFavoriteClicked() }
+
+        setupAddToPlaylistBottomSheet()
 
         viewModel.ui.observe(viewLifecycleOwner) { ui ->
             binding.progressText.text = formatMs(ui.progressMs)
@@ -114,6 +125,64 @@ class PlayerFragment : Fragment() {
         playBtn.isEnabled = true
         playBtn.setImageResource(R.drawable.ic_play_32)
         progressText.text = "00:00"
+    }
+
+    private fun setupAddToPlaylistBottomSheet() {
+        val bottomSheet = binding.playlistsBottomSheet
+        val overlay = binding.overlay
+        val behavior = BottomSheetBehavior.from(bottomSheet).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+        }
+        behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                overlay.visibility = when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> View.GONE
+                    else -> View.VISIBLE
+                }
+            }
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+        })
+
+        binding.addToPlaylistBtn.setOnClickListener {
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
+
+        binding.newPlaylistFromPlayerBtn.setOnClickListener {
+            behavior.state = BottomSheetBehavior.STATE_HIDDEN
+            val bundle = Bundle().apply {
+                currentTrack?.let { putParcelable("trackToAdd", it) }
+            }
+            findNavController().navigate(R.id.action_playerFragment_to_createPlaylistFragment, bundle)
+        }
+
+        binding.playlistsBottomSheetRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.playlistsBottomSheetRecyclerView.adapter = bottomSheetAdapter
+
+        viewModel.playlistsForSheet.observe(viewLifecycleOwner) { list ->
+            bottomSheetAdapter.submitList(list)
+        }
+
+        viewModel.addToPlaylistResult.observe(viewLifecycleOwner) { result ->
+            if (result == null) return@observe
+            when (result) {
+                is PlayerAddToPlaylistResult.Added -> {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.track_added_to_playlist_toast, result.playlistName),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    behavior.state = BottomSheetBehavior.STATE_HIDDEN
+                }
+                is PlayerAddToPlaylistResult.AlreadyIn -> {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.track_already_in_playlist_toast, result.playlistName),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+            viewModel.consumeAddToPlaylistResult()
+        }
     }
 
     private fun formatMs(ms: Int): String =

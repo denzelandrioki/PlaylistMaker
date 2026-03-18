@@ -4,12 +4,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.practicum.playlistmaker.domain.entity.Playlist
 import com.practicum.playlistmaker.domain.entity.PlayerState
 import com.practicum.playlistmaker.domain.entity.Track
 import com.practicum.playlistmaker.domain.interactor.FavoritesInteractor
+import com.practicum.playlistmaker.domain.interactor.PlaylistsInteractor
 import com.practicum.playlistmaker.domain.interactor.PlayerInteractor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -23,13 +27,26 @@ private const val TICK_MS = 300L
 class PlayerViewModel(
     private val player: PlayerInteractor,
     private val favorites: FavoritesInteractor,
+    private val playlists: PlaylistsInteractor,
 ) : ViewModel() {
 
     private val _ui = MutableLiveData(PlayerUiState())
     val ui: LiveData<PlayerUiState> = _ui
 
+    private val _playlistsForSheet = MutableLiveData<List<Playlist>>(emptyList())
+    val playlistsForSheet: LiveData<List<Playlist>> = _playlistsForSheet
+
+    private val _addToPlaylistResult = MutableLiveData<PlayerAddToPlaylistResult?>(null)
+    val addToPlaylistResult: LiveData<PlayerAddToPlaylistResult?> = _addToPlaylistResult
+
     private var progressJob: Job? = null
     private var currentTrack: Track? = null
+
+    init {
+        playlists.getPlaylists()
+            .onEach { _playlistsForSheet.postValue(it) }
+            .launchIn(viewModelScope)
+    }
 
     /** Вызывается при открытии экрана: сохраняем трек и запрашиваем актуальное isFavorite из БД. */
     fun setTrack(track: Track) {
@@ -74,6 +91,23 @@ class PlayerViewModel(
     private fun onCompletion() {
         stopProgressTicker()
         _ui.postValue(_ui.value!!.copy(state = PlayerState.COMPLETED, progressMs = 0))
+    }
+
+    /** Добавить текущий трек в выбранный плейлист. Результат — в addToPlaylistResult (Toast). */
+    fun addTrackToPlaylist(playlist: Playlist) {
+        val track = currentTrack ?: return
+        if (track.trackId in playlist.trackIds) {
+            _addToPlaylistResult.value = PlayerAddToPlaylistResult.AlreadyIn(playlist.name)
+            return
+        }
+        viewModelScope.launch {
+            playlists.addTrackToPlaylist(track, playlist)
+            _addToPlaylistResult.postValue(PlayerAddToPlaylistResult.Added(playlist.name))
+        }
+    }
+
+    fun consumeAddToPlaylistResult() {
+        _addToPlaylistResult.value = null
     }
 
     /** Добавить/удалить текущий трек из избранного. Состояние обновляется по актуальным данным. */
