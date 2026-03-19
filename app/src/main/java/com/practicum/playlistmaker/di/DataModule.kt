@@ -47,3 +47,4 @@ val dataModule = module {
     // Репо настроек (обёртка над SharedPreferences)
     single<PrefsRepository> { PrefsStorage(get()) }
 }
+

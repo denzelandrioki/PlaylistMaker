@@ -31,4 +31,13 @@
     <color name="searchField_dark">#FFFFFF</color>
 
     <color name="favorite_active">#F56B6C</color>
+
+    <!-- Экран создания плейлиста: подсказки и обводка полей -->
+    <color name="create_playlist_hint">@color/YP_Black</color>
+    <color name="create_playlist_stroke_default">#AEAFB4</color>
+    <color name="create_playlist_stroke_focused">#E6E8EB</color>
+
+    <!-- Toast «Плейлист создан»: светлая тема — тёмный фон, белый текст -->
+    <color name="toast_playlist_created_bg">#1A1B22</color>
+    <color name="toast_playlist_created_text">@android:color/white</color>
 </resources>

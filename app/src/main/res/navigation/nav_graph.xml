@@ -14,6 +14,11 @@
         <action
             android:id="@+id/action_mediaFragment_to_playerFragment"
             app:destination="@id/playerFragment" />
+        <action
+            android:id="@+id/action_mediaFragment_to_createPlaylistFragment"
+            app:destination="@id/createPlaylistFragment"
+            app:popUpTo="@id/mediaFragment"
+            app:popUpToInclusive="false" />
     </fragment>
 
     <fragment
@@ -38,11 +43,26 @@
         android:name="com.practicum.playlistmaker.presentation.player.PlayerFragment"
         android:label="Аудиоплеер"
         tools:layout="@layout/fragment_player">
-        <!-- Обязательный аргумент: Track для отображения и previewUrl -->
         <argument
             android:name="track"
             app:argType="com.practicum.playlistmaker.domain.entity.Track"
             app:nullable="false" />
+        <action
+            android:id="@+id/action_playerFragment_to_createPlaylistFragment"
+            app:destination="@id/createPlaylistFragment"
+            app:popUpTo="@id/playerFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createPlaylistFragment"
+        android:name="com.practicum.playlistmaker.presentation.createplaylist.CreatePlaylistFragment"
+        android:label="@string/create_playlist_screen_title"
+        tools:layout="@layout/fragment_create_playlist">
+        <argument
+            android:name="trackToAdd"
+            app:argType="com.practicum.playlistmaker.domain.entity.Track"
+            app:nullable="true" />
     </fragment>
 
 </navigation>

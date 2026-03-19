@@ -46,4 +46,7 @@
     <dimen name="empty_state_icon_text_gap">16dp</dimen>
     <dimen name="playlist_button_to_empty_gap">46dp</dimen>
 
+    <!-- Отступ Toast «Плейлист создан» от низа экрана -->
+    <dimen name="toast_margin_bottom">80dp</dimen>
+
 </resources>

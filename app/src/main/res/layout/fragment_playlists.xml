@@ -33,8 +33,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Пустое состояние: иконка и текст -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/playlistsRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/newPlaylistButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/item_playlist"
+        tools:visibility="visible" />
 
+    <!-- Пустое состояние: иконка и текст -->
     <ImageView
         android:id="@+id/emptyIcon"
         style="@style/IconEmptyMedia"
@@ -51,6 +65,7 @@
         tools:ignore="ContentDescription" />
 
     <TextView
+        android:id="@+id/emptyText"
         style="@style/TextEmptyState"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

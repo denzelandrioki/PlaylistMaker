@@ -51,6 +51,24 @@
     <string name="new_playlist">Новый плейлист</string>
     <string name="empty_media_library">Ваша медиатека пуста</string>
     <string name="no_playlists_message">Вы не создали\nни одного плейлиста</string>
+    <string name="create_playlist_screen_title">Новый плейлист</string>
+    <string name="create_playlist_title_hint">Название*</string>
+    <string name="create_playlist_description_hint">Описание</string>
+    <string name="create_playlist_button">Создать</string>
+    <string name="discard_dialog_title">Завершить создание плейлиста?</string>
+    <string name="discard_dialog_message">Все несохраненные данные будут потеряны</string>
+    <string name="discard_dialog_cancel">Отмена</string>
+    <string name="discard_dialog_confirm">Завершить</string>
+    <string name="playlist_created_toast">Плейлист %s создан</string>
+    <string name="add_to_playlist_sheet_title">Добавить в плейлист</string>
+    <string name="track_added_to_playlist_toast">Добавлено в плейлист %s</string>
+    <string name="track_already_in_playlist_toast">Трек уже добавлен в плейлист %s</string>
+    <plurals name="tracks_count">
+        <item quantity="one">%d трек</item>
+        <item quantity="few">%d трека</item>
+        <item quantity="many">%d треков</item>
+        <item quantity="other">%d треков</item>
+    </plurals>
 
     <!-- Для тега атрибуции воспроизведения аудио (manifest) -->
     <string name="audio_playback_attribution">Воспроизведение аудиопревью</string>

@@ -38,11 +38,12 @@ class MainActivity : AppCompatActivity() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigationView.setupWithNavController(navController)
 
-        // На экране плеера нижняя панель скрывается (переход из поиска по треку)
+        // На экране плеера и создания плейлиста нижняя панель скрывается
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            val isPlayerFragment = destination.id == R.id.playerFragment
-            binding.bottomNavigationView.visibility = if (isPlayerFragment) android.view.View.GONE else android.view.View.VISIBLE
-            binding.bottomNavDivider.visibility = if (isPlayerFragment) android.view.View.GONE else android.view.View.VISIBLE
+            val hideBottomNav = destination.id == R.id.playerFragment ||
+                destination.id == R.id.createPlaylistFragment
+            binding.bottomNavigationView.visibility = if (hideBottomNav) android.view.View.GONE else android.view.View.VISIBLE
+            binding.bottomNavDivider.visibility = if (hideBottomNav) android.view.View.GONE else android.view.View.VISIBLE
         }
     }
 }
