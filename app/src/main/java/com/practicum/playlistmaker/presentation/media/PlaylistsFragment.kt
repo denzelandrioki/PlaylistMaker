@@ -17,7 +17,14 @@ class PlaylistsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: PlaylistsViewModel by viewModel()
-    private val adapter = PlaylistsAdapter(onPlaylistClick = { /* переход на экран плейлиста — позже */ })
+    private val adapter = PlaylistsAdapter(onPlaylistClick = { playlist ->
+        parentFragment?.view?.let { view ->
+            Navigation.findNavController(view).navigate(
+                R.id.action_mediaFragment_to_playlistFragment,
+                Bundle().apply { putLong("playlistId", playlist.id) },
+            )
+        }
+    })
 
     companion object {
         fun newInstance() = PlaylistsFragment()

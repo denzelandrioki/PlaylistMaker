@@ -24,4 +24,7 @@ interface PlaylistsDao {
     @Transaction
     @Query("SELECT * FROM playlists ORDER BY id DESC")
     fun getAllPlaylistsWithTracks(): Flow<List<PlaylistWithTracks>>
+
+    @Query("DELETE FROM playlists WHERE id = :id")
+    suspend fun deleteById(id: Long)
 }

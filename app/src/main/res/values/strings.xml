@@ -55,6 +55,8 @@
     <string name="create_playlist_title_hint">Название*</string>
     <string name="create_playlist_description_hint">Описание</string>
     <string name="create_playlist_button">Создать</string>
+    <string name="edit_playlist_screen_title">Редактировать</string>
+    <string name="edit_playlist_button">Сохранить</string>
     <string name="discard_dialog_title">Завершить создание плейлиста?</string>
     <string name="discard_dialog_message">Все несохраненные данные будут потеряны</string>
     <string name="discard_dialog_cancel">Отмена</string>
@@ -69,6 +71,23 @@
         <item quantity="many">%d треков</item>
         <item quantity="other">%d треков</item>
     </plurals>
+
+    <!-- Экран плейлиста -->
+    <string name="playlist_duration_minutes">%d мин</string>
+    <string name="playlist_stats_separator"> • </string>
+    <string name="playlist_share_content_description">Поделиться</string>
+    <string name="playlist_menu_content_description">Меню</string>
+    <string name="playlist_remove_track_dialog_title">Хотите удалить трек?</string>
+    <string name="playlist_remove_track_dialog_no">НЕТ</string>
+    <string name="playlist_remove_track_dialog_yes">ДА</string>
+    <string name="playlist_share_empty_toast">В этом плейлисте нет списка треков, которым можно поделиться</string>
+    <string name="playlist_menu_share">Поделиться</string>
+    <string name="playlist_menu_edit">Редактировать информацию</string>
+    <string name="playlist_menu_delete">Удалить плейлист</string>
+    <string name="playlist_delete_dialog_title">Удалить плейлист</string>
+    <string name="playlist_delete_dialog_message">Вы уверены, что хотите удалить этот плейлист?</string>
+    <string name="playlist_delete_dialog_cancel">Отмена</string>
+    <string name="playlist_delete_dialog_confirm">Удалить</string>
 
     <!-- Для тега атрибуции воспроизведения аудио (manifest) -->
     <string name="audio_playback_attribution">Воспроизведение аудиопревью</string>

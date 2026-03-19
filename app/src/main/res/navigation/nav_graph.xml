@@ -19,6 +19,41 @@
             app:destination="@id/createPlaylistFragment"
             app:popUpTo="@id/mediaFragment"
             app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_mediaFragment_to_playlistFragment"
+            app:destination="@id/playlistFragment"
+            app:popUpTo="@id/mediaFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/playlistFragment"
+        android:name="com.practicum.playlistmaker.presentation.playlist.PlaylistFragment"
+        android:label="@string/playlists"
+        tools:layout="@layout/fragment_playlist">
+        <argument
+            android:name="playlistId"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_playlistFragment_to_playerFragment"
+            app:destination="@id/playerFragment"
+            app:popUpTo="@id/playlistFragment"
+            app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_playlistFragment_to_editPlaylistFragment"
+            app:destination="@id/editPlaylistFragment"
+            app:popUpTo="@id/playlistFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/editPlaylistFragment"
+        android:name="com.practicum.playlistmaker.presentation.editplaylist.EditPlaylistFragment"
+        android:label="@string/edit_playlist_screen_title"
+        tools:layout="@layout/fragment_create_playlist">
+        <argument
+            android:name="playlistId"
+            app:argType="long" />
     </fragment>
 
     <fragment

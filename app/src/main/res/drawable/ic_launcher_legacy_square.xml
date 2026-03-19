@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Квадратная (squircle) Legacy-иконка по макету дизайнера. Исходник: ic_lunch_app.svg -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="452"
+    android:viewportHeight="452">
+    <!-- Фон: скруглённый прямоугольник #1E1E1E -->
+    <path
+        android:fillColor="#1E1E1E"
+        android:pathData="M 169.26,0 H 282.1 Q 451.36,0 451.36,169.26 V 282.1 Q 451.36,451.36 282.1,451.36 H 169.26 Q 0,451.36 0,282.1 V 169.26 Q 0,0 169.26,0 Z" />
+    <!-- Белый символ плейлиста -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M234.143 209.415L359.465 121.664L369.174 135.529L242.548 224.191L382.712 289.552L375.559 304.892L234.139 238.946V394.941H217.213V322.542L204.642 393.838L187.973 390.899L205.902 289.218L162.609 382.062L147.269 374.909L202.721 255.99L101.456 340.961L90.5766 327.995L199.673 236.452L57.8051 248.863L56.3305 232.001L204.589 219.031L90.5786 123.366L101.458 110.399L217.216 207.532V55.2914H234.143V209.415Z" />
+</vector>

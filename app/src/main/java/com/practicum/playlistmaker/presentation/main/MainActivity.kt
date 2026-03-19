@@ -41,7 +41,8 @@ class MainActivity : AppCompatActivity() {
         // На экране плеера и создания плейлиста нижняя панель скрывается
         navController.addOnDestinationChangedListener { _, destination, _ ->
             val hideBottomNav = destination.id == R.id.playerFragment ||
-                destination.id == R.id.createPlaylistFragment
+                destination.id == R.id.createPlaylistFragment ||
+                destination.id == R.id.playlistFragment
             binding.bottomNavigationView.visibility = if (hideBottomNav) android.view.View.GONE else android.view.View.VISIBLE
             binding.bottomNavDivider.visibility = if (hideBottomNav) android.view.View.GONE else android.view.View.VISIBLE
         }
