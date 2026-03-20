@@ -35,7 +35,8 @@ open class CreatePlaylistFragment : Fragment() {
         ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
         if (uri != null) {
-            viewModel.setCoverUri(uri.toString())
+            val uriString = uri.toString()
+            viewModel.setCoverUri(uriString)
             Glide.with(this)
                 .load(uri)
                 .centerCrop()

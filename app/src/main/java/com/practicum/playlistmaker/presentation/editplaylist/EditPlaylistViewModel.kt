@@ -3,6 +3,7 @@ package com.practicum.playlistmaker.presentation.editplaylist
 import androidx.lifecycle.SavedStateHandle
 import com.practicum.playlistmaker.presentation.createplaylist.CreatePlaylistEvent
 import com.practicum.playlistmaker.presentation.createplaylist.CreatePlaylistViewModel
+import com.practicum.playlistmaker.presentation.createplaylist.CreatePlaylistState
 import com.practicum.playlistmaker.domain.interactor.PlaylistsInteractor
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
@@ -15,13 +16,22 @@ class EditPlaylistViewModel(
     private val playlistId: Long = savedStateHandle.get<Long>("playlistId") ?: 0L
 
     init {
+        loadPlaylistData()
+    }
+
+    /** Загрузить актуальные данные плейлиста из БД (вызывается при каждом открытии экрана). */
+    fun loadPlaylistData() {
         if (playlistId != 0L) {
             viewModelScope.launch {
-                playlists.getPlaylistById(playlistId)?.let { playlist ->
-                    setInitialState(
-                        title = playlist.name,
-                        description = playlist.description,
-                        coverUri = playlist.coverUri?.toString(),
+                val playlist = playlists.getPlaylistById(playlistId)
+                playlist?.let {
+                    val coverUriString = it.coverUri?.toString()
+                    // Используем value = вместо postValue(), так как мы уже в корутине
+                    _state.value = CreatePlaylistState(
+                        title = it.name,
+                        description = it.description,
+                        coverUri = coverUriString,
+                        createButtonEnabled = it.name.isNotBlank(),
                     )
                 }
             }
@@ -43,6 +53,8 @@ class EditPlaylistViewModel(
                 description = s.description.trim(),
                 coverUri = s.coverUri,
             )
+            // Небольшая задержка для гарантии, что данные обновились в БД
+            kotlinx.coroutines.delay(100)
             _events.postValue(CreatePlaylistEvent.NavigateBack)
         }
     }

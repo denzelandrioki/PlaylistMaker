@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -68,10 +69,10 @@ class PlaylistFragment : Fragment() {
             }
             binding.playlistTitle.text = playlist.name
             if (playlist.description.isNotBlank()) {
-                binding.playlistDescription.visibility = View.VISIBLE
+                binding.playlistDescription.isVisible = true
                 binding.playlistDescription.text = playlist.description
             } else {
-                binding.playlistDescription.visibility = View.GONE
+                binding.playlistDescription.isVisible = false
             }
             val durationStr = getString(R.string.playlist_duration_minutes, state.durationMinutes.toInt())
             val tracksStr = resources.getQuantityString(
@@ -81,14 +82,19 @@ class PlaylistFragment : Fragment() {
             )
             binding.playlistStats.text = "$durationStr • $tracksStr"
             if (playlist.coverUri != null) {
-                binding.playlistCover.visibility = View.VISIBLE
+                binding.playlistCover.isVisible = true
                 binding.playlistCover.setBackgroundResource(0)
+                // Очищаем кэш Glide перед загрузкой новой картинки
+                Glide.with(this).clear(binding.playlistCover)
+                // Загружаем картинку с принудительным обновлением кэша
                 Glide.with(this)
                     .load(playlist.coverUri)
                     .centerCrop()
+                    .skipMemoryCache(true) // Пропускаем кэш в памяти
+                    .diskCacheStrategy(com.bumptech.glide.load.engine.DiskCacheStrategy.NONE) // Не кэшируем на диск
                     .into(binding.playlistCover)
             } else {
-                binding.playlistCover.visibility = View.VISIBLE
+                binding.playlistCover.isVisible = true
                 Glide.with(this).clear(binding.playlistCover)
                 binding.playlistCover.setImageResource(R.drawable.img_placeholder)
                 binding.playlistCover.setBackgroundResource(R.drawable.cover_placeholder_playlist)
@@ -101,6 +107,15 @@ class PlaylistFragment : Fragment() {
                 findNavController().navigateUp()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Перезагружаем плейлист при возврате с экрана редактирования, чтобы отобразить обновлённую обложку
+        // Используем post с задержкой для гарантии, что данные обновились в БД
+        binding.root.postDelayed({
+            viewModel.refreshPlaylist()
+        }, 500)
     }
 
     private fun setupShareButton() {
@@ -150,16 +165,15 @@ class PlaylistFragment : Fragment() {
         }
         behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                overlay.visibility = when (newState) {
-                    BottomSheetBehavior.STATE_HIDDEN -> View.GONE
-                    else -> View.VISIBLE
-                }
+                overlay.isVisible = newState != BottomSheetBehavior.STATE_HIDDEN
             }
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         })
 
-        binding.menuButton.setOnClickListener {
-            viewModel.state.value?.playlist?.let { playlist ->
+        // Обновляем меню при изменении state (включая обложку)
+        viewModel.state.observe(viewLifecycleOwner) { state ->
+            if (!state.isLoading && state.playlist != null) {
+                val playlist = state.playlist
                 binding.menuSheetTitle.text = playlist.name
                 binding.menuSheetTrackCount.text = resources.getQuantityString(
                     R.plurals.tracks_count,
@@ -167,7 +181,13 @@ class PlaylistFragment : Fragment() {
                     playlist.trackCount,
                 )
                 if (playlist.coverUri != null) {
-                    Glide.with(this).load(playlist.coverUri).centerCrop().into(binding.menuSheetCover)
+                    Glide.with(this).clear(binding.menuSheetCover)
+                    Glide.with(this)
+                        .load(playlist.coverUri)
+                        .centerCrop()
+                        .skipMemoryCache(true)
+                        .diskCacheStrategy(com.bumptech.glide.load.engine.DiskCacheStrategy.NONE)
+                        .into(binding.menuSheetCover)
                     binding.menuSheetCover.setBackgroundResource(0)
                 } else {
                     Glide.with(this).clear(binding.menuSheetCover)
@@ -175,6 +195,9 @@ class PlaylistFragment : Fragment() {
                     binding.menuSheetCover.setBackgroundResource(R.drawable.cover_placeholder_playlist)
                 }
             }
+        }
+
+        binding.menuButton.setOnClickListener {
             behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
 

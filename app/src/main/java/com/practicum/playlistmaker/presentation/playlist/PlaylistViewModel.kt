@@ -92,4 +92,20 @@ class PlaylistViewModel(
     fun consumeNavigateBackAfterDelete() {
         _navigateBackAfterDelete.value = false
     }
+
+    fun refreshPlaylist() {
+        viewModelScope.launch {
+            val playlist = interactor.getPlaylistById(playlistId)
+            if (playlist != null) {
+                val currentTracks = _tracks.value ?: emptyList()
+                val durationSum = currentTracks.sumOf { it.trackTimeMillis }
+                val totalMinutes = durationSum / (60 * 1000)
+                _state.value = PlaylistScreenState(
+                    playlist = playlist,
+                    durationMinutes = totalMinutes,
+                    isLoading = false,
+                )
+            }
+        }
+    }
 }
