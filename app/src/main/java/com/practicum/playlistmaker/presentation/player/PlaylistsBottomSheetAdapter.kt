@@ -35,8 +35,15 @@ class PlaylistsBottomSheetAdapter(
             binding.playlistTrackCount.text = binding.root.context.resources
                 .getQuantityString(R.plurals.tracks_count, playlist.trackCount, playlist.trackCount)
             if (playlist.coverUri != null) {
-                Glide.with(binding.root).load(playlist.coverUri).centerCrop().into(binding.playlistCover)
+                Glide.with(binding.root).clear(binding.playlistCover)
+                Glide.with(binding.root)
+                    .load(playlist.coverUri)
+                    .centerCrop()
+                    .skipMemoryCache(true)
+                    .diskCacheStrategy(com.bumptech.glide.load.engine.DiskCacheStrategy.NONE)
+                    .into(binding.playlistCover)
             } else {
+                Glide.with(binding.root).clear(binding.playlistCover)
                 binding.playlistCover.setImageResource(R.drawable.img_placeholder)
             }
             binding.root.setOnClickListener { onPlaylistClick(playlist) }

@@ -23,21 +23,31 @@ data class CreatePlaylistState(
     val createButtonEnabled: Boolean = false,
 )
 
-class CreatePlaylistViewModel(
-    private val playlists: PlaylistsInteractor,
+open class CreatePlaylistViewModel(
+    protected val playlists: PlaylistsInteractor,
 ) : ViewModel() {
 
     /** Трек, который нужно добавить в новый плейлист (при переходе из плеера). */
     private var trackToAdd: Track? = null
 
-    private val _state = MutableLiveData(CreatePlaylistState())
+    protected val _state = MutableLiveData(CreatePlaylistState())
     val state: LiveData<CreatePlaylistState> = _state
 
-    private val _events = SingleLiveEvent<CreatePlaylistEvent>()
+    protected val _events = SingleLiveEvent<CreatePlaylistEvent>()
     val events: SingleLiveEvent<CreatePlaylistEvent> = _events
 
-    private fun updateState(block: CreatePlaylistState.() -> CreatePlaylistState) {
+    protected fun updateState(block: CreatePlaylistState.() -> CreatePlaylistState) {
         _state.value = (_state.value ?: CreatePlaylistState()).block()
+    }
+
+    /** Заполнить поля начальными данными (для экрана редактирования). */
+    fun setInitialState(title: String, description: String, coverUri: String?) {
+        _state.value = CreatePlaylistState(
+            title = title,
+            description = description,
+            coverUri = coverUri,
+            createButtonEnabled = title.isNotBlank(),
+        )
     }
 
     fun setTitle(value: String) {
@@ -68,7 +78,7 @@ class CreatePlaylistViewModel(
         return t.isNotEmpty() || d.isNotEmpty() || s.coverUri != null
     }
 
-    fun onBackPressed() {
+    open fun onBackPressed() {
         if (hasUnsavedData()) {
             _events.value = CreatePlaylistEvent.ShowDiscardDialog
         } else {
@@ -84,7 +94,7 @@ class CreatePlaylistViewModel(
         _events.value = CreatePlaylistEvent.NavigateBack
     }
 
-    fun createPlaylist() {
+    open fun createPlaylist() {
         val s = _state.value ?: return
         val name = s.title.trim()
         if (name.isBlank()) return

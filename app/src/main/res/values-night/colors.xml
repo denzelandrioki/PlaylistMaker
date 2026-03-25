@@ -19,6 +19,7 @@
 
 
     <color name="bottom_nav_divider">#33FFFFFF</color>
+    <color name="playlist_header_bg">#2C2D30</color>
 
     <!-- Дополнительные цвета для ночной темы -->
 

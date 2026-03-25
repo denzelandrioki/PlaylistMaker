@@ -25,17 +25,18 @@ import com.practicum.playlistmaker.util.getParcelableCompat
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import android.widget.Toast
 
-class CreatePlaylistFragment : Fragment() {
+open class CreatePlaylistFragment : Fragment() {
 
-    private var _binding: FragmentCreatePlaylistBinding? = null
-    private val binding get() = _binding!!
-    private val viewModel: CreatePlaylistViewModel by viewModel()
+    protected var _binding: FragmentCreatePlaylistBinding? = null
+    protected val binding get() = _binding!!
+    open val viewModel: CreatePlaylistViewModel by viewModel()
 
     private val pickMedia = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
         if (uri != null) {
-            viewModel.setCoverUri(uri.toString())
+            val uriString = uri.toString()
+            viewModel.setCoverUri(uriString)
             Glide.with(this)
                 .load(uri)
                 .centerCrop()

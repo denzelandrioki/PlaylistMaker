@@ -23,6 +23,7 @@
     <color name="new_playlist_btn_text">#FFFFFF</color>
 
     <color name="bottom_nav_divider">#E6E8EB</color>
+    <color name="playlist_header_bg">#E6E8EB</color>
 
 
     <!-- Дополнительные цвета для дневной темы -->
