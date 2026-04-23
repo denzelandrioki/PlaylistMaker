@@ -11,6 +11,7 @@ interface PlayerInteractor {
     fun stop()
     fun state(): PlayerState
     fun currentPositionMs(): Int
+    fun setOnPausedByAudioFocusListener(listener: (() -> Unit)?)
 }
 
 class PlayerInteractorImpl(
@@ -33,4 +34,7 @@ class PlayerInteractorImpl(
     override fun state(): PlayerState = repo.state()
 
     override fun currentPositionMs(): Int = repo.currentPositionMs()
+
+    override fun setOnPausedByAudioFocusListener(listener: (() -> Unit)?) =
+        repo.setOnPausedByAudioFocusListener(listener)
 }

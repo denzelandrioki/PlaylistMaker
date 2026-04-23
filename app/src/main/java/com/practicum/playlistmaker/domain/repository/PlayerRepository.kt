@@ -15,4 +15,7 @@ interface PlayerRepository {
     fun stop()           // <-- добавлено
     fun currentPositionMs(): Int
     fun state(): PlayerState
+
+    /** Вызывается, если воспроизведение приостановлено из‑за потери аудиофокуса (звонок и т.п.). */
+    fun setOnPausedByAudioFocusListener(listener: (() -> Unit)?)
 }

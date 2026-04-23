@@ -1,3 +1,3 @@
 package com.practicum.playlistmaker.domain.entity
 
-enum class PlayerState { IDLE, PREPARED, PLAYING, PAUSED, COMPLETED, ERROR }
+enum class PlayerState { IDLE, PREPARING, PREPARED, PLAYING, PAUSED, COMPLETED, ERROR }
