@@ -29,6 +29,11 @@ val repositoryModule = module {
     // Фабрика MediaPlayer
     factory<() -> MediaPlayer> { { MediaPlayer() } }
 
-    // Репозиторий плеера
-    single<PlayerRepository> { PlayerRepositoryImpl(mediaPlayerFactory = get()) }
+    // Репозиторий плеера (нужен Context для AudioAttributes / аудиофокуса)
+    single<PlayerRepository> {
+        PlayerRepositoryImpl(
+            appContext = androidContext().applicationContext,
+            mediaPlayerFactory = get(),
+        )
+    }
 }

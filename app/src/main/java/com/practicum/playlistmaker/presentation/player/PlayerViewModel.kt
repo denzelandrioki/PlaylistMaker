@@ -46,6 +46,18 @@ class PlayerViewModel(
         playlists.getPlaylists()
             .onEach { _playlistsForSheet.postValue(it) }
             .launchIn(viewModelScope)
+
+        player.setOnPausedByAudioFocusListener {
+            stopProgressTicker()
+            _ui.postValue(
+                _ui.value!!.copy(
+                    state = PlayerState.PAUSED,
+                    progressMs = player.currentPositionMs(),
+                    canPlay = true,
+                    canPause = false,
+                )
+            )
+        }
     }
 
     /** Вызывается при открытии экрана: сохраняем трек и запрашиваем актуальное isFavorite из БД. */
@@ -59,9 +71,21 @@ class PlayerViewModel(
 
     /** Загрузка превью по URL. Вызывать после setTrack(track). */
     fun prepare(url: String) {
+        if (url.isBlank()) {
+            player.prepare(
+                url = url,
+                onPrepared = {},
+                onComplete = { onCompletion() },
+                onError = { onCompletion() }
+            )
+            return
+        }
+        _ui.postValue(_ui.value!!.copy(state = PlayerState.PREPARING, progressMs = 0))
         player.prepare(
             url = url,
-            onPrepared = { _ui.postValue(_ui.value!!.copy(state = PlayerState.PREPARED, progressMs = 0)) },
+            onPrepared = {
+                _ui.postValue(_ui.value!!.copy(state = PlayerState.PREPARED, progressMs = 0))
+            },
             onComplete = { onCompletion() },
             onError = { onCompletion() }
         )
@@ -71,6 +95,7 @@ class PlayerViewModel(
     fun playPause() {
         when (player.state()) {
             PlayerState.PLAYING -> pause()
+            PlayerState.PREPARING -> return
             PlayerState.PAUSED, PlayerState.PREPARED, PlayerState.COMPLETED,
             PlayerState.IDLE, PlayerState.ERROR -> play()
         }
@@ -78,6 +103,7 @@ class PlayerViewModel(
 
     private fun play() {
         player.play()
+        if (player.state() != PlayerState.PLAYING) return
         _ui.value = _ui.value!!.copy(state = PlayerState.PLAYING, canPlay = false, canPause = true)
         startProgressTicker()
     }

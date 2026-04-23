@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <attr name="searchIconTint" format="reference|color"/>
+
+    <declare-styleable name="PlaybackButtonView">
+        <attr name="playbackIconPlay" format="reference" />
+        <attr name="playbackIconPause" format="reference" />
+    </declare-styleable>
 </resources>

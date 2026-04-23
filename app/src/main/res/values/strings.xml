@@ -91,4 +91,6 @@
 
     <!-- Для тега атрибуции воспроизведения аудио (manifest) -->
     <string name="audio_playback_attribution">Воспроизведение аудиопревью</string>
+    <!-- Пустая строка для второго &lt;attribution&gt; (требование AppOps / пустой tag) -->
+    <string name="attribution_tag_empty" translatable="false"></string>
 </resources>

@@ -58,17 +58,14 @@ class PlayerFragment : Fragment() {
         bindTrack(track)
         viewModel.prepare(track.previewUrl.orEmpty())
 
-        binding.playBtn.setOnClickListener { viewModel.playPause() }
+        binding.playBtn.setOnPlaybackToggleListener { viewModel.playPause() }
         binding.favBtn.setOnClickListener { viewModel.onFavoriteClicked() }
 
         setupAddToPlaylistBottomSheet()
 
         viewModel.ui.observe(viewLifecycleOwner) { ui ->
             binding.progressText.text = formatMs(ui.progressMs)
-            binding.playBtn.setImageResource(
-                if (ui.state == PlayerState.PLAYING) R.drawable.ic_pause_32
-                else R.drawable.ic_play_32
-            )
+            binding.playBtn.setPlaybackPlaying(ui.state == PlayerState.PLAYING)
             binding.favBtn.setImageResource(
                 if (ui.isFavorite) R.drawable.ic_fav_button_enabled else R.drawable.ic_fav_button_disabled
             )
@@ -123,7 +120,7 @@ class PlayerFragment : Fragment() {
             .into(coverImage)
 
         playBtn.isEnabled = true
-        playBtn.setImageResource(R.drawable.ic_play_32)
+        playBtn.setPlaybackPlaying(false)
         progressText.text = "00:00"
     }
 
