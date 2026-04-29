@@ -18,6 +18,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistBinding
 import com.practicum.playlistmaker.domain.entity.Track
+import com.practicum.playlistmaker.util.applySystemBarBottomInsetAsPadding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistFragment : Fragment() {
@@ -159,6 +160,7 @@ class PlaylistFragment : Fragment() {
 
     private fun setupMenuSheet() {
         val menuSheet = binding.playlistMenuSheet
+        menuSheet.applySystemBarBottomInsetAsPadding()
         val overlay = binding.playlistMenuOverlay
         val behavior = BottomSheetBehavior.from(menuSheet).apply {
             state = BottomSheetBehavior.STATE_HIDDEN

@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.data.repository
 
+import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -7,16 +8,19 @@ import com.practicum.playlistmaker.data.mapper.TrackMapper
 import com.practicum.playlistmaker.data.network.ItunesApi
 import com.practicum.playlistmaker.domain.entity.Track
 import com.practicum.playlistmaker.domain.repository.TracksRepository
+import com.practicum.playlistmaker.util.isInternetAvailable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import java.io.IOException
 
 /**
  * Реализация репозитория треков: поиск через iTunes API, история в SharedPreferences.
  * isFavorite не выставляется здесь — только во ViewModel плеера при входе на экран.
  */
 class TracksRepositoryImpl(
+    private val appContext: Context,
     private val api: ItunesApi,
     private val mapper: TrackMapper,
     private val gson: Gson,
@@ -24,6 +28,10 @@ class TracksRepositoryImpl(
 ) : TracksRepository {
 
     override fun search(query: String): Flow<Result<List<Track>>> = flow {
+        if (!appContext.isInternetAvailable()) {
+            emit(Result.failure(IOException("No internet")))
+            return@flow
+        }
         val result = withContext(Dispatchers.IO) {
             runCatching {
                 val response = api.search(query)
