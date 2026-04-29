@@ -30,6 +30,7 @@
 
 
     <string name="no_tracks_found">Ничего не нашлось</string>
+    <string name="no_internet_toast">Отсутствует подключение к интернету</string>
     <string name="server_error">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
     <string name="retry">Обновить</string>
 
@@ -88,6 +89,10 @@
     <string name="playlist_delete_dialog_message">Вы уверены, что хотите удалить этот плейлист?</string>
     <string name="playlist_delete_dialog_cancel">Отмена</string>
     <string name="playlist_delete_dialog_confirm">Удалить</string>
+
+    <!-- Foreground-сервис плеера -->
+    <string name="player_notification_channel_name">Воспроизведение</string>
+    <string name="player_notification_channel_description">Уведомление при воспроизведении в фоновом режиме</string>
 
     <!-- Для тега атрибуции воспроизведения аудио (manifest) -->
     <string name="audio_playback_attribution">Воспроизведение аудиопревью</string>

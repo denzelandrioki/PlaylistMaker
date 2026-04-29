@@ -1,11 +1,20 @@
 package com.practicum.playlistmaker.presentation.player
 
+import android.Manifest
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,12 +25,14 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlayerBinding
 import com.practicum.playlistmaker.domain.entity.PlayerState
 import com.practicum.playlistmaker.domain.entity.Track
+import com.practicum.playlistmaker.service.PlayerService
+import com.practicum.playlistmaker.util.applySystemBarBottomInsetAsPadding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
-/** Экран плеера: отображение трека и воспроизведение превью по previewUrl. */
+/** Экран плеера: привязка к [PlayerService], отображение трека и управление воспроизведением. */
 class PlayerFragment : Fragment() {
 
     private var _binding: FragmentPlayerBinding? = null
@@ -30,6 +41,27 @@ class PlayerFragment : Fragment() {
 
     private var currentTrack: Track? = null
 
+    /** true, если вызывали bindService — нужен парный unbind. */
+    private var playerBindRequested: Boolean = false
+
+    private val requestNotificationPermission = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { /* при отказе foreground может не показаться — воспроизведение не блокируем */ }
+
+    private val playerServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as PlayerService.PlayerBinder
+            val svc = binder.getService()
+            viewModel.attachPlayer(svc)
+            val url = currentTrack?.previewUrl.orEmpty()
+            viewModel.preparePlayback(url)
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            viewModel.detachPlayer()
+        }
+    }
+
     private val bottomSheetAdapter = PlaylistsBottomSheetAdapter { playlist ->
         viewModel.addTrackToPlaylist(playlist)
     }
@@ -37,7 +69,7 @@ class PlayerFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentPlayerBinding.inflate(inflater, container, false)
         return binding.root
@@ -54,9 +86,28 @@ class PlayerFragment : Fragment() {
             ?: error("Track argument is missing")
         currentTrack = track
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val ctx = requireContext()
+            when {
+                ContextCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) ==
+                    PackageManager.PERMISSION_GRANTED -> Unit
+                else -> requestNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+
         viewModel.setTrack(track)
         bindTrack(track)
-        viewModel.prepare(track.previewUrl.orEmpty())
+
+        val bindIntent = Intent(requireContext(), PlayerService::class.java).apply {
+            putExtra(PlayerService.EXTRA_PREVIEW_URL, track.previewUrl.orEmpty())
+            putExtra(PlayerService.EXTRA_ARTIST_NAME, track.artistName)
+            putExtra(PlayerService.EXTRA_TRACK_NAME, track.trackName)
+        }
+        playerBindRequested = requireContext().bindService(
+            bindIntent,
+            playerServiceConnection,
+            Context.BIND_AUTO_CREATE,
+        )
 
         binding.playBtn.setOnPlaybackToggleListener { viewModel.playPause() }
         binding.favBtn.setOnClickListener { viewModel.onFavoriteClicked() }
@@ -67,11 +118,21 @@ class PlayerFragment : Fragment() {
             binding.progressText.text = formatMs(ui.progressMs)
             binding.playBtn.setPlaybackPlaying(ui.state == PlayerState.PLAYING)
             binding.favBtn.setImageResource(
-                if (ui.isFavorite) R.drawable.ic_fav_button_enabled else R.drawable.ic_fav_button_disabled
+                if (ui.isFavorite) R.drawable.ic_fav_button_enabled else R.drawable.ic_fav_button_disabled,
             )
             binding.favBtn.imageTintList = null
             if (ui.state == PlayerState.COMPLETED) binding.progressText.text = "00:00"
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.onPlayerFragmentStart()
+    }
+
+    override fun onStop() {
+        viewModel.onPlayerFragmentStop()
+        super.onStop()
     }
 
     private fun bindTrack(track: Track) = with(binding) {
@@ -126,6 +187,7 @@ class PlayerFragment : Fragment() {
 
     private fun setupAddToPlaylistBottomSheet() {
         val bottomSheet = binding.playlistsBottomSheet
+        bottomSheet.applySystemBarBottomInsetAsPadding()
         val overlay = binding.overlay
         val behavior = BottomSheetBehavior.from(bottomSheet).apply {
             state = BottomSheetBehavior.STATE_HIDDEN
@@ -137,6 +199,7 @@ class PlayerFragment : Fragment() {
                     else -> View.VISIBLE
                 }
             }
+
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}
         })
 
@@ -166,7 +229,7 @@ class PlayerFragment : Fragment() {
                     Toast.makeText(
                         requireContext(),
                         getString(R.string.track_added_to_playlist_toast, result.playlistName),
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_SHORT,
                     ).show()
                     behavior.state = BottomSheetBehavior.STATE_HIDDEN
                 }
@@ -174,7 +237,7 @@ class PlayerFragment : Fragment() {
                     Toast.makeText(
                         requireContext(),
                         getString(R.string.track_already_in_playlist_toast, result.playlistName),
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_SHORT,
                     ).show()
                 }
             }
@@ -189,13 +252,18 @@ class PlayerFragment : Fragment() {
 
     @Suppress("DEPRECATION")
     private inline fun <reified T : android.os.Parcelable> Bundle.getParcelableCompat(key: String): T? =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             getParcelable(key, T::class.java)
-        else
+        } else {
             getParcelable(key)
+        }
 
     override fun onDestroyView() {
+        if (playerBindRequested) {
+            runCatching { requireContext().unbindService(playerServiceConnection) }
+            playerBindRequested = false
+        }
+        viewModel.detachPlayer()
         super.onDestroyView()
-        _binding = null
     }
 }

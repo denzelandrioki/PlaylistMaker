@@ -10,6 +10,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivityMainBinding
+import com.practicum.playlistmaker.presentation.common.ConnectivityLossToastHelper
 
 /**
  * Единственная Activity: контейнер для Navigation Component и нижней навигации.
@@ -18,6 +19,10 @@ import com.practicum.playlistmaker.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
+    private val connectivityLossToastHelper by lazy {
+        ConnectivityLossToastHelper(this) { isOnSearchOrPlayerDestination() }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +51,25 @@ class MainActivity : AppCompatActivity() {
                 destination.id == R.id.playlistFragment
             binding.bottomNavigationView.visibility = if (hideBottomNav) android.view.View.GONE else android.view.View.VISIBLE
             binding.bottomNavDivider.visibility = if (hideBottomNav) android.view.View.GONE else android.view.View.VISIBLE
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        connectivityLossToastHelper.onStart()
+    }
+
+    override fun onStop() {
+        connectivityLossToastHelper.onStop()
+        super.onStop()
+    }
+
+    private fun isOnSearchOrPlayerDestination(): Boolean {
+        val navHost = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? NavHostFragment
+            ?: return false
+        return when (navHost.navController.currentDestination?.id) {
+            R.id.searchFragment, R.id.playerFragment -> true
+            else -> false
         }
     }
 }

@@ -66,13 +66,25 @@ class PlaybackButtonView @JvmOverloads constructor(
     fun setPlaybackPlaying(playing: Boolean) {
         if (playbackPlaying == playing) return
         playbackPlaying = playing
+        layoutIconDst()
         invalidate()
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         hitRect.set(0, 0, w, h)
-        val bmp = playBitmap ?: pauseBitmap ?: return
+        layoutIconDst()
+    }
+
+    private fun activeBitmap(): Bitmap? =
+        if (playbackPlaying) pauseBitmap else playBitmap
+
+    /** Прямоугольник отрисовки под текущую иконку (play/pause могут отличаться по intrinsic size). */
+    private fun layoutIconDst() {
+        val w = width
+        val h = height
+        if (w <= 0 || h <= 0) return
+        val bmp = activeBitmap() ?: playBitmap ?: pauseBitmap ?: return
         val bw = bmp.width.toFloat()
         val bh = bmp.height.toFloat()
         val scale = minOf(w / bw, h / bh)
