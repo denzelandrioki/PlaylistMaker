@@ -46,11 +46,11 @@ class PlayerViewModel(
     }
 
     /** После [android.content.ServiceConnection.onServiceConnected]. */
-    fun attachPlayer(control: PlayerAudioControl) {
-        audio = control
+    fun attachPlayer(audioControl: PlayerAudioControl) {
+        audio = audioControl
         flowCollectJob?.cancel()
         flowCollectJob = viewModelScope.launch {
-            combine(control.playerState, control.progressMs) { state, progress ->
+            combine(audioControl.playerState, audioControl.progressMs) { state, progress ->
                 state to progress
             }.collect { (state, progressMs) ->
                 val base = _ui.value ?: return@collect
@@ -64,13 +64,13 @@ class PlayerViewModel(
                 )
             }
         }
-        control.setOnPausedByAudioFocusListener {
-            val c = audio ?: return@setOnPausedByAudioFocusListener
+        audioControl.setOnPausedByAudioFocusListener {
+            val attachedAudioControl = audio ?: return@setOnPausedByAudioFocusListener
             val base = _ui.value ?: return@setOnPausedByAudioFocusListener
             _ui.postValue(
                 base.copy(
                     state = PlayerState.PAUSED,
-                    progressMs = c.currentPositionMs(),
+                    progressMs = attachedAudioControl.currentPositionMs(),
                     canPlay = true,
                     canPause = false,
                 ),
@@ -93,9 +93,9 @@ class PlayerViewModel(
 
     /** Приложение ушло с экрана (в фон) — при активном воспроизведении показываем foreground. */
     fun onPlayerFragmentStop() {
-        val c = audio ?: return
-        if (c.playerState.value == PlayerState.PLAYING) {
-            c.showForegroundNotification()
+        val audioControl = audio ?: return
+        if (audioControl.playerState.value == PlayerState.PLAYING) {
+            audioControl.showForegroundNotification()
         }
     }
 
@@ -109,9 +109,9 @@ class PlayerViewModel(
     }
 
     fun preparePlayback(url: String) {
-        val c = audio ?: return
+        val audioControl = audio ?: return
         if (url.isBlank()) {
-            c.prepare(
+            audioControl.prepare(
                 url = "",
                 onPrepared = {},
                 onComplete = { postCompletionUi() },
@@ -120,7 +120,7 @@ class PlayerViewModel(
             return
         }
         _ui.postValue((_ui.value ?: PlayerUiState()).copy(state = PlayerState.PREPARING, progressMs = 0))
-        c.prepare(
+        audioControl.prepare(
             url = url,
             onPrepared = {
                 val base = _ui.value ?: return@prepare
@@ -137,12 +137,12 @@ class PlayerViewModel(
     }
 
     fun playPause() {
-        val c = audio ?: return
-        when (c.playerState.value) {
-            PlayerState.PLAYING -> c.pause()
+        val audioControl = audio ?: return
+        when (audioControl.playerState.value) {
+            PlayerState.PLAYING -> audioControl.pause()
             PlayerState.PREPARING -> return
             PlayerState.PAUSED, PlayerState.PREPARED, PlayerState.COMPLETED,
-            PlayerState.IDLE, PlayerState.ERROR -> c.play()
+            PlayerState.IDLE, PlayerState.ERROR -> audioControl.play()
         }
     }
 

@@ -33,6 +33,13 @@ class SearchViewModel(
     private val _state = MutableLiveData<SearchState>(SearchState.History(emptyList()))
     val state: LiveData<SearchState> = _state
 
+    /**
+     * Текст поля поиска для Compose: состояние в ViewModel избегает remember в UI и
+     * упрощает связку с тем же источником, что запускает дебаунс и поиск в [onQueryChanged].
+     */
+    private val _searchQuery = MutableLiveData("")
+    val searchQuery: LiveData<String> = _searchQuery
+
     private var lastQuery: String? = null
     private var searchJob: Job? = null
     private var clickJob: Job? = null
@@ -51,6 +58,7 @@ class SearchViewModel(
 
     /** Дебаунс ввода; после задержки — запуск Flow поиска в viewModelScope. */
     fun onQueryChanged(text: String) {
+        _searchQuery.value = text
         lastQuery = text
         searchJob?.cancel()
 
